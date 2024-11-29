@@ -1,0 +1,45 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="CheckEmptyScriptTag" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="16">
+            <item index="0" class="java.lang.String" itemvalue=":class" />
+            <item index="1" class="java.lang.String" itemvalue="@click.outside" />
+            <item index="2" class="java.lang.String" itemvalue="x-data" />
+            <item index="3" class="java.lang.String" itemvalue="@click.prevent" />
+            <item index="4" class="java.lang.String" itemvalue="@click.stop" />
+            <item index="5" class="java.lang.String" itemvalue=":value" />
+            <item index="6" class="java.lang.String" itemvalue="@change" />
+            <item index="7" class="java.lang.String" itemvalue="x-show" />
+            <item index="8" class="java.lang.String" itemvalue="x-init" />
+            <item index="9" class="java.lang.String" itemvalue="x-text" />
+            <item index="10" class="java.lang.String" itemvalue="x-model" />
+            <item index="11" class="java.lang.String" itemvalue="@click" />
+            <item index="12" class="java.lang.String" itemvalue="x-transition" />
+            <item index="13" class="java.lang.String" itemvalue="@submit.prevent" />
+            <item index="14" class="java.lang.String" itemvalue="@input.debounce.500" />
+            <item index="15" class="java.lang.String" itemvalue="x-ref" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="IncorrectHttpHeaderInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="customHeaders">
+        <set>
+          <option value="Content-Security-Policy" />
+          <option value="X-XSS-Protection" />
+        </set>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="UNCHECKED_WARNING" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>

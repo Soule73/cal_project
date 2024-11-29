@@ -1,0 +1,20 @@
+<Context>
+    <!-- Other Context settings -->
+    <Resource name="jdbc/languageCenterDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="100"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="root"
+              password="password"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/cal_db"/>
+
+    <Manager className="org.apache.catalina.session.PersistentManager" debug="1">
+        <Store className="org.apache.catalina.session.FileStore"
+               directory="C:\laragon\apache-tomcat-11.0.1\work\Catalina\localhost\ROOT"/>
+    </Manager>
+
+
+</Context>

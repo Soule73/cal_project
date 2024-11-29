@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+    <persistence-unit name="default">
+
+    </persistence-unit>
+
+    <persistence-unit name="languageCenterPU">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>com.cal.models.User</class>
+        <class>com.cal.models.Learner</class>
+        <class>com.cal.models.Course</class>
+        <class>com.cal.models.Language</class>
+        <class>com.cal.models.Subscription</class>
+        <class>com.cal.models.Level</class>
+        <class>com.cal.models.Message</class>
+        <class>com.cal.models.Room</class>
+        <class>com.cal.models.LearnerLanguage</class>
+        <class>com.cal.models.LearnerSubscription</class>
+        <class>com.cal.models.SessionEntity</class>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/cal_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value=""/>
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+        </properties>
+    </persistence-unit>
+</persistence>
