@@ -39,6 +39,7 @@
                 <!-- Breadcrumb Start -->
                 <tg:breadcrumb name="Détails de langue"/>
                 <!-- Breadcrumb End -->
+                <tgc:alerte-delete-modal/>
 
                 <!-- ====== Subscrition Start -->
                 <div
@@ -72,7 +73,7 @@
                                             title="Search within table"
                                     >
                                 </div>
-                                <tgc:add-form/>
+                                <tgc:add-or-update-form/>
 
                             </div>
                             <div >
@@ -120,9 +121,13 @@
                                                     <p class="text-black dark:text-white" x-text="course.typeOfCourse"></p>
                                                 </td>
                                                 <td
-                                                        class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                                        class="border-b flex gap-2.5 border-[#eee] px-4 py-5 dark:border-strokedark">
                                                     <button @click="editCourse(course)"
                                                             class="text-blue-500">Modifier</button>
+
+                                                    <button @click="deleteCourseForm(course)"
+                                                            style="color:red"
+                                                            class="text-blue-500">Supprimer</button>
                                                 </td>
                                             </tr>
                                         </template>
@@ -226,6 +231,14 @@
                 };
                 // Remplir le formulaire de modification avec les valeurs du cours sélectionné
                 window.courseForm(data);
+            },
+            deleteCourse(course) {
+                const data = {
+                    id: course.id,
+                    name: course.name,
+                };
+                // Remplir le formulaire de modification avec les valeurs du cours sélectionné
+                window.deleteCourseForm(data);
             },
 
             prevPage() {

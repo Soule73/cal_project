@@ -85,7 +85,6 @@ public class CourseFormServlet extends HttpServlet {
 
 
 
-
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONObject jsonObject = parseRequestBody(request, response);
@@ -141,6 +140,52 @@ public class CourseFormServlet extends HttpServlet {
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
         } finally {
             if (em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        JSONObject jsonObject = parseRequestBody(request, response);
+        if (jsonObject == null) return;
+
+        Map<String, String> errors = new HashMap<>();
+        Long courseId = jsonObject.optLong("id", 0);
+        if (courseId == 0) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            errors.put("id", "ID du cours manquant");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return;
+        }
+
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            Course course = em.find(Course.class, courseId);
+            if (course == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                errors.put("global", "Cours non trouvé");
+                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+                return;
+            }
+
+            em.remove(course);
+            transaction.commit();
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été supprimé avec succès!")).toString());
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            errors.put("global", "Une erreur s'est produite lors de la suppression du cours.");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+        } finally {
+            if (em != null && em.isOpen()) {
                 em.close();
             }
         }
