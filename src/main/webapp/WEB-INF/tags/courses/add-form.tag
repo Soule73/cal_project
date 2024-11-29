@@ -5,13 +5,13 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div x-data="courseForm()" x-init="init()" x-cloak>
-<button @click="modalOpen = true" class="rounded-md bg-primary px-9 py-3 font-medium text-white ">
+<button @click="openModal" class="rounded-md bg-primary px-9 py-3 font-medium text-white ">
     Ajouter un cours
 </button>
 <div x-show="modalOpen" x-transition="" class="overflow-y-auto md:max-h-[80vh] fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5">
-    <div @click.outside="modalOpen = false" class="w-full max-w-142.5  xl:max-w-4xl rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
+    <div @click.outside="closeModal" class="w-full max-w-142.5  xl:max-w-4xl rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
         <h4 x-show="!successMessage" class=" mb-6 text-xl font-bold text-black dark:text-white">
-            Langue : <c:out value="${language.name}"/> | Ajouter un cours
+            Langue : <c:out value="${language.name}"/> | <span x-text="formTitle"></span>
 
         </h4>
         <!-- Form -->
@@ -33,7 +33,8 @@
                 />
                 <div class="mb-4 px-2">
                     <label for="level"
-                           class="block text-sm font-bold">Niveau</label>
+                           class="mb-3 block text-sm font-medium text-black dark:text-white"
+                    >Niveau</label>
                     <select id="level" name="level" x-model="form.level"
                             class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary">
                         <option value="" class="text-body">Sélectionner un niveau
@@ -47,7 +48,8 @@
                 </div>
                 <div class="mb-4 px-2">
                     <label for="level"
-                           class="block text-sm font-bold">Salle de cours</label>
+                           class="mb-3 block text-sm font-medium text-black dark:text-white"
+                    >Salle de cours</label>
                     <select id="room" name="room" x-model="form.room"
                             class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary">
                         <option value="" class="text-body">Sélectionner un niveau
@@ -61,7 +63,9 @@
                 </div>
                 <div class="mb-4 px-2">
                     <label for="subscription"
-                           class="block text-sm font-bold">Abonnement</label>
+                           class="mb-3 block text-sm font-medium text-black dark:text-white"
+
+                         >Abonnement</label>
                     <select id="subscription" name="subscription" x-model="form.subscription"
                             class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary">
                         <option value="" class="text-body">Sélectionner un niveau
@@ -99,14 +103,14 @@
             <input type="hidden"
                    id="languageId"
                    name="languageId"
-                   value="${language.getId()}"
+<%--                   value="${language.getId()}"--%>
                    x-model="form.languageId">
 
 
 
             <div class="flex justify-end">
-                <button type="submit" class="block w-full w-max rounded border border-primary bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90">
-                    Ajouter
+                <button x-text="submitBtnText" type="submit" class="block w-full w-max rounded border border-primary bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90">
+<%--                    Ajouter--%>
                 </button>
             </div>
 
@@ -117,11 +121,11 @@
              class="flex w-full mb-4 border-l-6 border-[#34D399] bg-[#34D399] bg-opacity-[15%] px-7 py-8 shadow-md dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9"
         >
             <div
-                    class="mr-5 flex h-9 w-full max-w-[36px] items-center justify-center rounded-lg bg-[#34D399]"
+                    class="mr-5 flex w-max p-4 w-full  items-center justify-center rounded-full bg-[#34D399]"
             >
                 <svg
-                        width="16"
-                        height="12"
+                        width="56"
+                        height="50"
                         viewBox="0 0 16 12"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +147,7 @@
                 </p>
             </div>
         </div>
-        <div x-show="successMessage" @click="modalOpen = false" class="flex justify-end">
+        <div x-show="successMessage" @click="closeModal" class="flex justify-end">
             <button type="submit" class="block w-full w-max rounded border border-primary bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90">
                 Fermer
             </button>
@@ -156,39 +160,70 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('courseForm', () => ({
+            formTitle:"Ajouter un cours",
+            submitBtnText:"Ajouter",
             modalOpen: false,
-            form: {id:null, languageId: '${language.id}', name: '', identifier: '', description: '', specificEquipment: '', typeOfCourse: '' },
+            form: {
+                id:null,
+                languageId: '${language.id}',
+                name: '',
+                level: '',
+                room: '',
+                subscription: '',
+                identifier: '',
+                description: '',
+                specificEquipment: '',
+                typeOfCourse: '',
+            },
             errors: {},
             successMessage: '',
 
             openModal() {
                 this.resetForm();
                 this.modalOpen = true;
+                this.successMessage = '';
+
             },
 
             closeModal() {
                 this.modalOpen = false;
                 this.resetForm();
+                this.successMessage = '';
+
             },
 
             setForm(course) {
                 this.form = { ...course };
+                this.formTitle=this.form.id ? "Modifier un cours":"Ajouter un cours";
+                this.submitBtnText=this.form.id ? "Sauvegarder":"Ajouter";
                 this.modalOpen = true;
             },
 
             resetForm() {
-                this.form = { id: null, languageId: 1, name: '', identifier: '', description: '', specificEquipment: '', typeOfCourse: '' };
+                this.formTitle="Ajouter un cours";
+                this.submitBtnText="Ajouter";
+                this.form = {
+                    id:null,
+                    languageId: '${language.id}',
+                    name: '',
+                    level: '',
+                    room: '',
+                    subscription: '',
+                    identifier: '',
+                    description: '',
+                    specificEquipment: '',
+                    typeOfCourse: '',
+                };
                 this.errors = {};
-                this.successMessage = '';
             },
 
             init(){
                 window.courseForm = this.setForm.bind(this);
-
             },
 
             submitForm() {
-                console.log("Sending data:", this.form);
+                const data = JSON.stringify(this.form);
+                console.log("Sending data:", data);
                 const method = this.form.id ? 'PUT' : 'POST';
 
                 fetch('<%=Routes.COURSE_FORM%>', {
@@ -196,7 +231,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.form)
+                    body: data
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -204,12 +239,9 @@
                             this.errors = data.errors;
                             console.log("Errors received:", this.errors);
                         } else {
-                            this.successMessage = 'Le cours a été ajouté avec succès!';
-                            // this.modalOpen = false;
-                            // Réinitialiser le formulaire
-                            this.form = { languageId: this.form.languageId, name: '', identifier: '', description: '', specificEquipment: '', typeOfCourse: '' };
-                            this.errors = {};
-
+                            const msg= this.form.id ? 'modifié' : 'ajouté';
+                            this.resetForm();
+                            this.successMessage = "Le cours a été "+msg+" avec succès!";
                             // Appeler la méthode globale pour rafraîchir les cours
                             window.refreshCourses();
 

@@ -35,43 +35,16 @@ public class CourseFormServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
+        JSONObject jsonObject = parseRequestBody(request, response);
+        if(jsonObject==null)return;
         Map<String, String> errors = new HashMap<>();
-
-        // Lire le contenu JSON du corps de la requête
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try (BufferedReader reader = request.getReader()) {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-        }
-
-        String jsonString = sb.toString();
-        // Analyser le JSON reçu
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(jsonString);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("global", "Données JSON invalides");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
 
         // Créer et définir les attributs de l'objet Course
         Course course = new Course();
         try {
             course.setLanguageId(jsonObject.getLong("languageId"));
-            course.setLevelId(jsonObject.getLong("level"));
-            course.setRoom(new Room());
-            course.getRoom().setId(jsonObject.getLong("room"));
-            course.setSubscriptionId(jsonObject.getLong("subscription"));
-            course.setName(jsonObject.getString("name"));
-            course.setIdentifier(jsonObject.getString("identifier"));
-            course.setDescription(jsonObject.optString("description"));
-            course.setSpecificEquipment(jsonObject.optString("specificEquipment"));
-            course.setTypeOfCourse(jsonObject.getString("typeOfCourse"));
+
+            checkInpuValue(jsonObject, course);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             errors.put("global", "Données JSON invalides");
@@ -80,18 +53,7 @@ public class CourseFormServlet extends HttpServlet {
         }
 
         // Validation des données
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<Course>> violations = validator.validate(course);
-
-        if (!violations.isEmpty()) {
-            for (ConstraintViolation<Course> violation : violations) {
-                errors.put(violation.getPropertyPath().toString(), violation.getMessage());
-            }
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
+        if (courseFormValition(response, errors, course)) return;
 
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
@@ -115,43 +77,25 @@ public class CourseFormServlet extends HttpServlet {
             errors.put("global", "Une erreur s'est produite lors de l'ajout du cours.");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
         } finally {
-            if (em != null && em.isOpen()) {
+            if (em.isOpen()) {
                 em.close();
             }
         }
     }
 
 
+
+
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
+        JSONObject jsonObject = parseRequestBody(request, response);
+        if (jsonObject == null) return;
+
         Map<String, String> errors = new HashMap<>();
-
-        // Lire le contenu JSON du corps de la requête
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try (BufferedReader reader = request.getReader()) {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-        }
-
-        String jsonString = sb.toString();
-        // Analyser le JSON reçu
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(jsonString);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("global", "Données JSON invalides");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
-        Long courseId = jsonObject.optLong("id", 0);
+        long courseId = jsonObject.optLong("id", 0);
         if (courseId == 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("global", "ID du cours manquant");
+            errors.put("id", "ID du cours manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return;
         }
@@ -171,15 +115,8 @@ public class CourseFormServlet extends HttpServlet {
 
             // Mettre à jour les attributs de l'objet Course
             try {
-                course.setLevelId(jsonObject.getLong("level"));
-                course.setRoom(new Room());
-                course.getRoom().setId(jsonObject.getLong("room"));
-                course.setSubscriptionId(jsonObject.getLong("subscription"));
-                course.setName(jsonObject.getString("name"));
-                course.setIdentifier(jsonObject.getString("identifier"));
-                course.setDescription(jsonObject.optString("description"));
-                course.setSpecificEquipment(jsonObject.optString("specificEquipment"));
-                course.setTypeOfCourse(jsonObject.getString("typeOfCourse"));
+
+                checkInpuValue(jsonObject, course);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 errors.put("global", "Données JSON invalides");
@@ -188,18 +125,7 @@ public class CourseFormServlet extends HttpServlet {
             }
 
             // Validation des données
-            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-            Validator validator = factory.getValidator();
-            Set<ConstraintViolation<Course>> violations = validator.validate(course);
-
-            if (!violations.isEmpty()) {
-                for (ConstraintViolation<Course> violation : violations) {
-                    errors.put(violation.getPropertyPath().toString(), violation.getMessage());
-                }
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
+            if (courseFormValition(response, errors, course)) return;
 
             em.merge(course);
             transaction.commit();
@@ -214,10 +140,76 @@ public class CourseFormServlet extends HttpServlet {
             errors.put("global", "Une erreur s'est produite lors de la mise à jour du cours.");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
         } finally {
-            if (em != null && em.isOpen()) {
+            if (em.isOpen()) {
                 em.close();
             }
         }
+    }
+
+    private JSONObject parseRequestBody(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        Map<String, String> errors = new HashMap<>();
+
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try (BufferedReader reader = request.getReader()) {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+
+        String jsonString = sb.toString();
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(jsonString);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            errors.put("global", "Données JSON invalides: " + e.getMessage());
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return null;
+        }
+
+        return jsonObject;
+    }
+
+
+    private boolean courseFormValition(HttpServletResponse response, Map<String, String> errors, Course course) throws IOException {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<Course>> violations = validator.validate(course);
+
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<Course> violation : violations) {
+                errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+            }
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return true;
+        }
+        return false;
+    }
+
+
+    private void checkInpuValue(JSONObject jsonObject, Course course) {
+        if(jsonObject.has("level") && !jsonObject.optString("level", "").isEmpty()){
+            course.setLevelId(jsonObject.getLong("level"));
+        }
+
+        if(jsonObject.has("subscription") && !jsonObject.optString("subscription", "").isEmpty()){
+            course.setLevelId(jsonObject.getLong("level"));
+        }
+
+        if(jsonObject.has("room") && !jsonObject.optString("room", "").isEmpty()){
+
+            course.setRoom(new Room());
+            course.getRoom().setId(jsonObject.getLong("room"));
+        }
+
+        course.setName(jsonObject.getString("name"));
+        course.setIdentifier(jsonObject.getString("identifier"));
+        course.setDescription(jsonObject.optString("description"));
+        course.setSpecificEquipment(jsonObject.optString("specificEquipment"));
+        course.setTypeOfCourse(jsonObject.getString("typeOfCourse"));
     }
 
 }

@@ -212,8 +212,20 @@
             },
 
             editCourse(course) {
+                const data = {
+                    id: course.id,
+                    languageId: course.languageId,
+                    name: course.name,
+                    level: course.levelId,
+                    room: course.roomId,
+                    subscription: course.subscriptionId,
+                    identifier: course.identifier,
+                    description: course.description,
+                    specificEquipment: course.specificEquipment,
+                    typeOfCourse: course.typeOfCourse,
+                };
                 // Remplir le formulaire de modification avec les valeurs du cours sélectionné
-                window.courseForm(course);
+                window.courseForm(data);
             },
 
             prevPage() {

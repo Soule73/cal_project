@@ -56,14 +56,12 @@ public class CourseServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = emf.createEntityManager();
-
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             String queryStr = "SELECT c FROM Course c WHERE c.language.id = :languageId";
             if (!searchQuery.isEmpty()) {
                 queryStr += " AND (c.name LIKE :searchQuery OR c.identifier LIKE :searchQuery)";
             }
-            queryStr +=" ORDER BY c.identifier";
+            queryStr += " ORDER BY c.identifier";
             TypedQuery<Course> query = em.createQuery(queryStr, Course.class)
                     .setParameter("languageId", languageId)
                     .setFirstResult((page - 1) * pageSize)
@@ -87,13 +85,7 @@ public class CourseServlet extends HttpServlet {
             JSONArray coursesJsonArray = new JSONArray();
 
             for (Course course : courses) {
-                JSONObject courseJson = new JSONObject();
-                courseJson.put("id", course.getId());
-                courseJson.put("identifier", course.getIdentifier());
-                courseJson.put("name", course.getName());
-                courseJson.put("level", course.getLevel().getName());
-                courseJson.put("description", course.getDescription());
-                courseJson.put("typeOfCourse", course.getTypeOfCourse());
+                JSONObject courseJson = getJsonObject(course);
                 coursesJsonArray.put(courseJson);
             }
 
@@ -103,9 +95,26 @@ public class CourseServlet extends HttpServlet {
             result.put("pageSize", pageSize);
 
             response.getWriter().write(result.toString());
-        } finally {
-            em.close();
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(new JSONObject().put("error", "Une erreur se produit").toString());
         }
+    }
+
+    private static JSONObject getJsonObject(Course course) {
+        JSONObject courseJson = new JSONObject();
+        courseJson.put("id", course.getId());
+        courseJson.put("languageId", course.getLanguage().getId());
+        courseJson.put("identifier", course.getIdentifier());
+        courseJson.put("name", course.getName());
+        courseJson.put("level", course.getLevel().getName());
+        courseJson.put("levelId", course.getLevel().getId());
+        courseJson.put("roomId", course.getRoom().getId());
+        courseJson.put("subscriptionId", course.getSubscription().getId());
+        courseJson.put("description", course.getDescription());
+        courseJson.put("typeOfCourse", course.getTypeOfCourse());
+        courseJson.put("specificEquipment", course.getSpecificEquipment());
+        return courseJson;
     }
 
 }
