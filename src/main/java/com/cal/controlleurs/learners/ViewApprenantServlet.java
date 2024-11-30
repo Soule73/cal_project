@@ -1,9 +1,7 @@
-package com.cal.controlleurs;
+package com.cal.controlleurs.learners;
 
-import com.cal.Routes;
 import com.cal.models.Learner;
-import com.cal.models.LearnerLanguage;
-import com.cal.models.LearnerSubscription;
+import com.cal.models.Subscription;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.ServletException;
@@ -13,11 +11,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Set;
+import java.util.List;
 
-@WebServlet(name = "apprenant.view", urlPatterns = {Routes.LEARNER_SHOW})
+import static com.cal.Routes.LEARNER_SHOW;
+
+@WebServlet(name = "apprenant.view", urlPatterns = {LEARNER_SHOW})
 public class ViewApprenantServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
@@ -39,23 +37,18 @@ public class ViewApprenantServlet extends HttpServlet {
                 return;
             }
 
-            // les langues de l'apprenant
-            Set<LearnerLanguage> languages = apprenant.getLearnerLanguages();
-
-            // Récupérer les abonnements et leurs cours pour l'apprenant
-            Set<LearnerSubscription> subscriptions = apprenant.getLearnerSubscriptions();
-            for (LearnerSubscription subscription : subscriptions) {
-                subscription.getSubscription().getCourses().size(); // Initialiser les cours
-            }
+            List<Subscription> subscriptionsList = em.createQuery(
+                            "SELECT s FROM Subscription s WHERE s.id NOT IN " +
+                                    "(SELECT ls.subscription.id FROM LearnerSubscription ls WHERE ls.learner.id = :learnerId)", Subscription.class)
+                    .setParameter("learnerId", id)
+                    .getResultList();
 
             request.setAttribute("apprenant", apprenant);
-            request.setAttribute("languages", languages);
-            request.setAttribute("subscriptions", subscriptions);
-            request.setAttribute("formatter", new SimpleDateFormat("EEEE 'Le' dd MMMM yyyy", Locale.FRENCH));
-
+            request.setAttribute("subscriptionsList", subscriptionsList);
             request.getRequestDispatcher("/WEB-INF/learner/view.jsp").forward(request, response);
         } finally {
             em.close();
         }
     }
+
 }

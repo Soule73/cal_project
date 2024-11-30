@@ -1,6 +1,5 @@
 package com.cal.controlleurs.courses;
 
-import com.cal.Routes;
 import com.cal.models.Course;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -17,7 +16,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet(name = "CourseServlet", urlPatterns = {Routes.LANG_COURSE})
+import static com.cal.Routes.LANG_COURSE;
+
+@WebServlet(name = "CourseServlet", urlPatterns = {LANG_COURSE})
 public class CourseServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
@@ -28,13 +29,13 @@ public class CourseServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
-        // Lire le contenu JSON du corps de la requête
+        
         String jsonString = request.getReader().lines().collect(Collectors.joining());
 
-        // Désérialiser le JSON avec org.json
+        
         JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(jsonString);
@@ -44,7 +45,7 @@ public class CourseServlet extends HttpServlet {
             return;
         }
 
-        // Extraire les paramètres du JSON désérialisé
+        
         int page = jsonObject.optInt("page", 1);
         int pageSize = jsonObject.optInt("pageSize", 10);
         Long languageId = jsonObject.optLong("languageId", 0);
@@ -62,6 +63,7 @@ public class CourseServlet extends HttpServlet {
                 queryStr += " AND (c.name LIKE :searchQuery OR c.identifier LIKE :searchQuery)";
             }
             queryStr += " ORDER BY c.identifier";
+
             TypedQuery<Course> query = em.createQuery(queryStr, Course.class)
                     .setParameter("languageId", languageId)
                     .setFirstResult((page - 1) * pageSize)
@@ -80,7 +82,7 @@ public class CourseServlet extends HttpServlet {
 
             long totalCourses = countQuery.getSingleResult();
 
-            // Préparer la réponse JSON
+            
             JSONObject result = new JSONObject();
             JSONArray coursesJsonArray = new JSONArray();
 

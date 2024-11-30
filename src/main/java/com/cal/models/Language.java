@@ -19,9 +19,6 @@ public class Language {
     private String name;
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.ALL)
-    private Set<LearnerLanguage> learnerLanguages;
-
-    @OneToMany(mappedBy = "language", cascade = CascadeType.ALL)
     private Set<Course> courses;
 
     // Getters and Setters
@@ -42,16 +39,7 @@ public class Language {
         this.name = name;
     }
 
-    public Set<LearnerLanguage> getLearnerLanguages() {
-        return learnerLanguages;
-    }
 
-    public void setLearnerLanguages(Set<LearnerLanguage> learnerLanguages) {
-        this.learnerLanguages = learnerLanguages;
-    }
-
-
-    // Getters and Setters pour courses
     public Set<Course> getCourses() {
         return courses;
     }

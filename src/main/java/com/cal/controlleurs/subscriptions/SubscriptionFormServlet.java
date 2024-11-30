@@ -1,6 +1,7 @@
-package com.cal.controlleurs.courses;
+package com.cal.controlleurs.subscriptions;
 
-import com.cal.models.Course;
+import com.cal.Routes;
+import com.cal.models.Subscription;
 import com.cal.utils.JsonData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -21,10 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.cal.Routes.COURSE_FORM;
+@WebServlet(Routes.SUBCRIPTION_FORM)
+public class SubscriptionFormServlet extends HttpServlet {
 
-@WebServlet(urlPatterns = COURSE_FORM)
-public class CourseFormServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
 
@@ -34,19 +34,17 @@ public class CourseFormServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
+        if (jsonObject == null) return;
 
-        if(jsonObject==null)return;
         Map<String, String> errors = new HashMap<>();
 
-
-        Course course = new Course();
+        Subscription subscription = new Subscription();
         try {
-
-            checkInpuValue(jsonObject, course);
+            setSubscritionFileds(jsonObject, subscription);
         } catch (Exception e) {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -56,20 +54,21 @@ public class CourseFormServlet extends HttpServlet {
         }
 
 
-        if (courseFormValition(response, errors, course)) return;
+        if (validateSubscriptionForm(response, errors, subscription)) return;
 
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         try {
             transaction.begin();
-            em.persist(course);
+            em.persist(subscription);
             transaction.commit();
-            
-            em.refresh(course);
+
+            em.refresh(subscription);
 
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été ajouté avec succès!", "courseId", course.getId())).toString());
+            response.getWriter().write(new JSONObject(Map.of("message", "L'abonnement a été ajouté avec succès!", "roomId", subscription.getId())).toString());
+
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -86,20 +85,21 @@ public class CourseFormServlet extends HttpServlet {
         }
     }
 
-
-
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
         if (jsonObject == null) return;
 
+        long subscriptionId = jsonObject.optLong("id", 0);
+
         Map<String, String> errors = new HashMap<>();
-        long courseId = jsonObject.optLong("id", 0);
-        if (courseId == 0) {
+
+        if (subscriptionId == 0) {
+
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID du cours manquant");
+            errors.put("id", "ID de l'abonnement manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return;
         }
@@ -107,34 +107,29 @@ public class CourseFormServlet extends HttpServlet {
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
-        try {
+    try {
             transaction.begin();
-            Course course = em.find(Course.class, courseId);
-            if (course == null) {
+            Subscription subscription = em.find(Subscription.class, subscriptionId);
+            if (subscription == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Cours non trouvé");
+                errors.put("global", "Abonnement non trouvé");
                 response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
                 return;
+
             }
 
-            // Mettre à jour les attributs de l'objet Course
-            try {
+            setSubscritionFileds(jsonObject, subscription);
 
-                checkInpuValue(jsonObject, course);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                errors.put("global", "Données JSON invalides");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
+            if (validateSubscriptionForm(response, errors, subscription)) return;
 
-            if (courseFormValition(response, errors, course)) return;
 
-            em.merge(course);
+            em.merge(subscription);
             transaction.commit();
 
+            em.refresh(subscription);
+
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été mis à jour avec succès!")).toString());
+            response.getWriter().write(new JSONObject(Map.of("message", "L'abonnement a été mis à jour avec succès!")).toString());
 
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -142,7 +137,7 @@ public class CourseFormServlet extends HttpServlet {
             }
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            errors.put("global", "Une erreur s'est produite lors de la mise à jour du cours.");
+            errors.put("global", "Une erreur s'est produite lors de la mise à jour de l'abonnement.");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
 
         } finally {
@@ -152,8 +147,21 @@ public class CourseFormServlet extends HttpServlet {
         }
     }
 
+    private void setSubscritionFileds(JSONObject jsonObject, Subscription subscription) {
+        subscription.setName(jsonObject.getString("name"));
+
+        if(jsonObject.has("price") && !jsonObject.optString("price", "").isEmpty()){
+
+            subscription.setPrice(Double.parseDouble(jsonObject.getString("price")));
+        }
+        subscription.setDescription(jsonObject.optString("description"));
+        subscription.setAccessConditions(jsonObject.optString("accessConditions"));
+        subscription.setType(jsonObject.getString("type"));
+        subscription.setStatus(jsonObject.getString("status"));
+    }
+
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
@@ -161,10 +169,11 @@ public class CourseFormServlet extends HttpServlet {
 
         Map<String, String> errors = new HashMap<>();
 
-        long courseId = jsonObject.optLong("id", 0);
-        if (courseId == 0) {
+        long subscriptionId = jsonObject.optLong("id", 0);
+        if (subscriptionId == 0) {
+
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID du cours manquant");
+            errors.put("id", "ID de l'abonnement manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return;
         }
@@ -174,28 +183,29 @@ public class CourseFormServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Course course = em.find(Course.class, courseId);
-            if (course == null) {
+            Subscription subscription = em.find(Subscription.class, subscriptionId);
+            if (subscription == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Cours non trouvé");
+                errors.put("global", "L'bonnement non trouvé");
                 response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
                 return;
             }
 
-            em.remove(course);
+            em.remove(subscription);
             transaction.commit();
 
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été supprimé avec succès!")).toString());
-        } catch (Exception e) {
+            response.getWriter().write(new JSONObject(Map.of("message", "L'abonnement a été supprimé avec succès!")).toString());
 
+        } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            errors.put("global", "Une erreur s'est produite lors de la suppression du cours.");
+            errors.put("global", "Une erreur s'est produite lors de la mise à jour de l'abonnement.");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+
         } finally {
             if (em.isOpen()) {
                 em.close();
@@ -204,47 +214,23 @@ public class CourseFormServlet extends HttpServlet {
     }
 
 
-    private boolean courseFormValition(HttpServletResponse response, Map<String, String> errors, Course course) throws IOException {
+    private boolean validateSubscriptionForm(HttpServletResponse response, Map<String, String> errors, Subscription subscription) throws IOException {
+
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<Course>> violations = validator.validate(course);
+        Set<ConstraintViolation<Subscription>> violations = validator.validate(subscription);
 
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<Course> violation : violations) {
+
+            for (ConstraintViolation<Subscription> violation : violations) {
                 errors.put(violation.getPropertyPath().toString(), violation.getMessage());
             }
+
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return true;
         }
         return false;
-    }
-
-
-    private void checkInpuValue(JSONObject jsonObject, Course course) {
-        if(jsonObject.has("level") && !jsonObject.optString("level", "").isEmpty()){
-            course.setLevelId(jsonObject.getLong("level"));
-        }
-
-        if(jsonObject.has("subscription") && !jsonObject.optString("subscription", "").isEmpty()){
-            course.setLevelId(jsonObject.getLong("level"));
-        }
-
-        if(jsonObject.has("languageId") && !jsonObject.optString("languageId", "").isEmpty()){
-            course.setLanguageId(jsonObject.getLong("languageId"));
-        }
-
-        if(jsonObject.has("room") && !jsonObject.optString("room", "").isEmpty()){
-
-            course.setRoomId(jsonObject.getLong("room"));
-        }
-
-        course.setName(jsonObject.getString("name"));
-
-        course.setIdentifier(jsonObject.getString("identifier"));
-        course.setDescription(jsonObject.optString("description"));
-        course.setSpecificEquipment(jsonObject.optString("specificEquipment"));
-        course.setTypeOfCourse(jsonObject.getString("typeOfCourse"));
     }
 
 }

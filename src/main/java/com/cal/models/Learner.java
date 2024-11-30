@@ -35,11 +35,16 @@ public class Learner {
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 
-    @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL)
-    private Set<LearnerSubscription> learnerSubscriptions;
+    @ManyToOne
+    @JoinColumn(name = "language_id")
+    private Language language;
+
+    @ManyToOne
+    @JoinColumn(name = "level_id")
+    private Level level;
 
     @OneToMany(mappedBy = "learner", cascade = CascadeType.ALL)
-    private Set<LearnerLanguage> learnerLanguages;
+    private Set<LearnerSubscription> learnerSubscriptions;
 
     // Getters and Setters
 
@@ -56,7 +61,7 @@ public class Learner {
     }
 
     public String getFullname() {
-        return firstname+" "+lastname;
+        return firstname + " " + lastname;
     }
 
     public void setFirstname(String firstname) {
@@ -87,6 +92,22 @@ public class Learner {
         this.createdAt = createdAt;
     }
 
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
+
     public Set<LearnerSubscription> getLearnerSubscriptions() {
         return learnerSubscriptions;
     }
@@ -95,11 +116,4 @@ public class Learner {
         this.learnerSubscriptions = learnerSubscriptions;
     }
 
-    public Set<LearnerLanguage> getLearnerLanguages() {
-        return learnerLanguages;
-    }
-
-    public void setLearnerLanguages(Set<LearnerLanguage> learnerLanguages) {
-        this.learnerLanguages = learnerLanguages;
-    }
 }

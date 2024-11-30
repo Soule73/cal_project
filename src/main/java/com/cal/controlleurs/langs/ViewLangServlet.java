@@ -38,7 +38,7 @@ public class ViewLangServlet extends HttpServlet {
                 return;
             }
 
-            // Forcer l'actualisation de l'entité
+            
             em.refresh(language);
 
             List<Level> levels = em.createQuery("SELECT l FROM Level l", Level.class).getResultList();

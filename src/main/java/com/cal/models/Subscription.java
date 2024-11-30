@@ -113,8 +113,6 @@ public class Subscription {
         this.learnerSubscriptions = learnerSubscriptions;
     }
 
-
-
     // Getters and Setters pour courses
     public Set<Course> getCourses() {
         return courses;

@@ -1,6 +1,7 @@
-package com.cal.controlleurs.langs;
+package com.cal.controlleurs.subscriptions;
 
-import com.cal.models.Language;
+import com.cal.Routes;
+import com.cal.models.Subscription;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
@@ -16,10 +17,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.cal.Routes.LANG_LIST;
-
-@WebServlet({LANG_LIST})
-public class LangListServlet extends HttpServlet {
+@WebServlet(Routes.SUBCRIPTION_LIST)
+public class SubscriptionListServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
 
@@ -31,19 +30,17 @@ public class LangListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.getRequestDispatcher("WEB-INF/langs/list.jsp")
+        request.getRequestDispatcher("/WEB-INF/subscriptions/list.jsp")
                 .forward(request, response);
+
     }
 
-
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
-        
         String jsonString = request.getReader().lines().collect(Collectors.joining());
 
-        
         JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(jsonString);
@@ -53,18 +50,17 @@ public class LangListServlet extends HttpServlet {
             return;
         }
 
-        
         int page = jsonObject.optInt("page", 1);
         int pageSize = jsonObject.optInt("pageSize", 10);
         String searchQuery = jsonObject.optString("searchQuery", "");
 
         try (EntityManager em = emf.createEntityManager()) {
-            String queryStr = "SELECT l FROM Language l";
+            String queryStr = "SELECT s FROM Subscription s";
             if (!searchQuery.isEmpty()) {
-                queryStr += " WHERE l.name LIKE :searchQuery";
+                queryStr += " WHERE s.name LIKE :searchQuery OR s.description LIKE :searchQuery";
             }
-            queryStr += " ORDER BY l.name";
-            TypedQuery<Language> query = em.createQuery(queryStr, Language.class)
+            queryStr += " ORDER BY s.id";
+            TypedQuery<Subscription> query = em.createQuery(queryStr, Subscription.class)
                     .setFirstResult((page - 1) * pageSize)
                     .setMaxResults(pageSize);
 
@@ -72,30 +68,27 @@ public class LangListServlet extends HttpServlet {
                 query.setParameter("searchQuery", "%" + searchQuery + "%");
             }
 
-            List<Language> languages = query.getResultList();
+            List<Subscription> subscriptions = query.getResultList();
 
-            // Compter le nombre total de langues pour la pagination
-            TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(l) FROM Language l", Long.class);
+            // Compter le nombre total d'abonnements pour la pagination
+            TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(s) FROM Subscription s", Long.class);
             if (!searchQuery.isEmpty()) {
-                countQuery = em.createQuery(
-                        "SELECT COUNT(l) FROM Language l WHERE l.name LIKE :searchQuery", Long.class
-                );
+                countQuery = em.createQuery("SELECT COUNT(s) FROM Subscription s WHERE s.name LIKE :searchQuery OR s.description LIKE :searchQuery", Long.class);
                 countQuery.setParameter("searchQuery", "%" + searchQuery + "%");
             }
 
-            long totalLanguages = countQuery.getSingleResult();
+            long totalSubscriptions = countQuery.getSingleResult();
 
-            
             JSONObject result = new JSONObject();
-            JSONArray languagesJsonArray = new JSONArray();
+            JSONArray subscriptionsJsonArray = new JSONArray();
 
-            for (Language language : languages) {
-                JSONObject languageJson = getJsonObject(language);
-                languagesJsonArray.put(languageJson);
+            for (Subscription subscription : subscriptions) {
+                JSONObject subscriptionJson = getJsonObject(subscription);
+                subscriptionsJsonArray.put(subscriptionJson);
             }
 
-            result.put("languages", languagesJsonArray);
-            result.put("totalLanguages", totalLanguages);
+            result.put("subscriptions", subscriptionsJsonArray);
+            result.put("totalSubscriptions", totalSubscriptions);
             result.put("page", page);
             result.put("pageSize", pageSize);
 
@@ -106,12 +99,15 @@ public class LangListServlet extends HttpServlet {
         }
     }
 
-    private static JSONObject getJsonObject(Language language) {
-        JSONObject languageJson = new JSONObject();
-        languageJson.put("id", language.getId());
-        languageJson.put("name", language.getName());
-        return languageJson;
+    private static JSONObject getJsonObject(Subscription subscription) {
+        JSONObject subscriptionJson = new JSONObject();
+        subscriptionJson.put("id", subscription.getId());
+        subscriptionJson.put("name", subscription.getName());
+        subscriptionJson.put("price", subscription.getPrice());
+        subscriptionJson.put("description", subscription.getDescription());
+        subscriptionJson.put("accessConditions", subscription.getAccessConditions());
+        subscriptionJson.put("type", subscription.getType());
+        subscriptionJson.put("status", subscription.getStatus());
+        return subscriptionJson;
     }
-
 }
-

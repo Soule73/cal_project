@@ -1,23 +1,14 @@
 <%@ page import="com.cal.models.Learner" %>
-<%@ page import="com.cal.models.LearnerSubscription" %>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="com.cal.models.LearnerLanguage" %>
-<%@ page import="com.cal.models.Course" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%@ page import="com.cal.Routes" %>
+
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="tgl" tagdir="/WEB-INF/tags/learners" %>
 
 
 <%
     Learner apprenant = (Learner) request.getAttribute("apprenant");
-
-    Set<LearnerSubscription> subscriptions = (Set<LearnerSubscription>)
-            request.getAttribute("subscriptions");
-
-    Set<LearnerLanguage> languages = (Set<LearnerLanguage>)
-            request.getAttribute("languages");
-
-    SimpleDateFormat formatter = (SimpleDateFormat)
-            request.getAttribute("formatter");
 
 %>
 
@@ -56,15 +47,14 @@
                 <!-- Breadcrumb Start -->
                 <tg:breadcrumb name="Détails de l'Apprenant"/>
                 <!-- Breadcrumb End -->
-
-
+                <tgl:unsub-form/>
                 <!-- ====== Profile Section Start -->
                 <div
                         class="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
                 >
                     <div class="relative z-20 h-35 md:h-65">
                         <img
-                                src="${pageContext.request.contextPath}/src/images/cover/cover-01.png"
+                                src="${pageContext.request.contextPath}/src/images/cover/cover.svg"
                                 alt="profile cover"
                                 class="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
                         />
@@ -75,7 +65,8 @@
                                 class="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3"
                         >
                             <div class="relative drop-shadow-2">
-                                <img src="${pageContext.request.contextPath}/src/images/user/user-06.png" alt="profile" />
+                                <img src="${pageContext.request.contextPath}/src/images/user/profile.svg"
+                                     alt="profile"/>
                                 <label
                                         for="profile"
                                         class="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -125,16 +116,13 @@
                         </div>
 
 
-
                     </div>
                 </div>
                 <!-- ====== Profile Section End -->
                 <!-- ====== languages Table Start -->
                 <div
                         class="rounded-sm border border-y-transparent border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-                    <h4 class="mb-6 text-xl font-bold text-black dark:text-white">
-                        Langues
-                    </h4>
+
                     <div class="max-w-full py-6 overflow-x-auto">
                         <table class="w-full table-auto">
                             <thead>
@@ -155,33 +143,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <%
-                                for (LearnerLanguage language : languages) {
-                            %>
+
                             <tr>
 
                                 <td
                                         class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <p class="text-black dark:text-white">
-                                        <%= language.getLanguage().getName() %>
+                                        <%= apprenant.getLanguage().getName() %>
                                     </p>
                                 </td>
                                 <td
                                         class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <p
                                             class="inline-flex px-3 py-1 text-sm font-medium text-success">
-                                        <%= language.getLevel().getName() %>
+                                        <%= apprenant.getLevel().getName() %>
                                     </p>
                                 </td>
                                 <td
                                         class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                                     <p class="text-black dark:text-white">
-                                        <%= language.getLevel().getDescription()%>
+                                        <%= apprenant.getLevel().getDescription()%>
                                     </p>
                                 </td>
 
                             </tr>
-                            <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -189,109 +174,81 @@
                 <!-- ====== languages Table End -->
 
                 <!-- ====== Subscrition Start -->
-                <div
-                        class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-                    <h4 class="mb-6 text-xl font-bold text-black dark:text-white">
-                        Abonnements
-                    </h4>
-                    <div class="max-w-full py-6 overflow-x-auto">
-                        <%
-                            for (LearnerSubscription subscription : subscriptions) {
-                        %>
-                        <div x-data="{ accordionOpen: false }" @click.outside="accordionOpen = false" class="rounded-md border border-stroke p-4  dark:border-strokedark  sm:p-6">
-                            <button @click="accordionOpen = !accordionOpen" class="flex w-full items-center gap-1.5 sm:gap-3 xl:gap-6">
-                                <div class="flex h-10.5 w-full max-w-10.5 items-center justify-center rounded-md bg-[#F3F5FC] dark:bg-meta-4">
-                                    <svg :class="accordionOpen &amp;&amp; 'rotate-180'" class="fill-primary stroke-primary duration-200 ease-in-out dark:fill-white dark:stroke-white" width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M8.28882 8.43257L8.28874 8.43265L8.29692 8.43985C8.62771 8.73124 9.02659 8.86001 9.41667 8.86001C9.83287 8.86001 10.2257 8.69083 10.5364 8.41713L10.5365 8.41721L10.5438 8.41052L16.765 2.70784L16.771 2.70231L16.7769 2.69659C17.1001 2.38028 17.2005 1.80579 16.8001 1.41393C16.4822 1.1028 15.9186 1.00854 15.5268 1.38489L9.41667 7.00806L3.3019 1.38063L3.29346 1.37286L3.28467 1.36548C2.93287 1.07036 2.38665 1.06804 2.03324 1.41393L2.0195 1.42738L2.00683 1.44184C1.69882 1.79355 1.69773 2.34549 2.05646 2.69659L2.06195 2.70196L2.0676 2.70717L8.28882 8.43257Z" fill="" stroke=""></path>
-                                    </svg>
-                                </div>
+                <div x-data="learnerSubscriptions()" x-init="init" x-cloak>
+                    <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+                        <div class=" flex justify-between ">
+                            <h4 class="mb-6 text-xl font-bold text-black dark:text-white">Abonnements</h4>
+                            <tgl:add-subscription-form/>
+                        </div>
+                        <div class="max-w-full py-6 overflow-x-auto">
+                            <template x-for="subscription in subscriptions" :key="subscription.id">
+                                <div x-data="{ accordionOpen: false }" @click.outside="accordionOpen = false"
+                                     class="rounded-md border border-stroke p-4 dark:border-strokedark sm:p-6">
+                                    <button @click="accordionOpen = !accordionOpen"
+                                            class="flex w-full items-center gap-1.5 sm:gap-3 xl:gap-6">
+                                        <div class="flex h-10.5 w-full max-w-10.5 items-center justify-center rounded-md bg-[#F3F5FC] dark:bg-meta-4">
+                                            <svg :class="accordionOpen && 'rotate-180'"
+                                                 class="fill-primary stroke-primary duration-200 ease-in-out dark:fill-white dark:stroke-white"
+                                                 width="18" height="10" viewBox="0 0 18 10" fill="none"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M8.28882 8.43257L8.28874 8.43265L8.29692 8.43985C8.62771 8.73124 9.02659 8.86001 9.41667 8.86001C9.83287 8.86001 10.2257 8.69083 10.5364 8.41713L10.5365 8.41721L10.5438 8.41052L16.765 2.70784L16.771 2.70231L16.7769 2.69659C17.1001 2.38028 17.2005 1.80579 16.8001 1.41393C16.4822 1.1028 15.9186 1.00854 15.5268 1.38489L9.41667 7.00806L3.3019 1.38063L3.29346 1.37286L3.28467 1.36548C2.93287 1.07036 2.38665 1.06804 2.03324 1.41393L2.0195 1.42738L2.00683 1.44184C1.69882 1.79355 1.69773 2.34549 2.05646 2.69659L2.06195 2.70196L2.0676 2.70717L8.28882 8.43257Z"
+                                                      fill="" stroke=""></path>
+                                            </svg>
+                                        </div>
 
-                                <div>
-                                    <h4 class="text-left text-title-xsm font-medium text-black dark:text-white">
-                                        <%=subscription.getSubscription().getName()%>
-                                    </h4>
-                                </div>
-                            </button>
-
-                            <div x-show="accordionOpen" class="mt-5 duration-200 ease-in-out" style="display: none;">
-                                <p class="ml-16.5 py-4 font-medium">
-                                    <%=subscription.getSubscription().getDescription()%>
-                                </p>
-                                <!-- ====== courses Table Start -->
-                                <div
-                                        class="rounded-sm border-t border-stroke bg-white px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-                                    <h4 class="mb-1 text-xl font-bold text-black dark:text-white">
-                                        Cours
-                                    </h4>
-                                    <div class="max-w-full pb-6 overflow-x-auto">
-                                        <table class="w-full table-auto">
-                                            <thead>
-                                            <tr class="bg-gray-2 text-left dark:bg-meta-4">
-                                                <th
-                                                        class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                                                    Identifiant
-                                                </th>
-                                                <th
-                                                        class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                                                    Nom
-                                                </th>
-                                                <th
-                                                        class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                                                    Description
-                                                </th>
-                                                <th
-                                                        class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                                                    Type de Cours
-                                                </th>
-
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <%
-                                                Set<Course> courses = subscription.getSubscription().getCourses();
-                                                for (Course course : courses) {
-                                            %>
-                                            <tr>
-
-                                                <td
-                                                        class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                                                    <p class="text-black dark:text-white">
-                                                        <%= course.getIdentifier() %>
-                                                    </p>
-                                                </td>
-                                                <td
-                                                        class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                                                    <p
-                                                            class="inline-flex px-3 py-1 text-sm font-medium text-success">
-                                                        <%= course.getName() %>
-                                                    </p>
-                                                </td>
-                                                <td
-                                                        class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                                                    <p class="text-black dark:text-white">
-                                                        <%= course.getDescription()%>
-                                                    </p>
-                                                </td>
-                                                <td
-                                                        class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                                                    <p class="text-black dark:text-white">
-                                                        <%= course.getTypeOfCourse()%>
-                                                    </p>
-                                                </td>
-
-                                            </tr>
-                                            <% } %>
-                                            </tbody>
-                                        </table>
+                                        <h4 class="text-left text-title-xsm font-medium text-black dark:text-white"
+                                            x-text="subscription.name"></h4>
+                                        <div @click="unSubcr(subscription)" class=" text-red-600">
+                                            Désabonner
+                                        </div>
+                                    </button>
+                                    <div x-show="accordionOpen" class="mt-5 duration-200 ease-in-out">
+                                        <p class="ml-16.5 py-4 font-medium" x-text="subscription.description"></p>
+                                        <div class="rounded-sm border-t border-stroke bg-white px-5 pb-2.5 pt-6 dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+                                            <h4 class="mb-1 text-xl font-bold text-black dark:text-white">Cours</h4>
+                                            <div class="max-w-full pb-6 overflow-x-auto">
+                                                <table class="w-full table-auto">
+                                                    <thead>
+                                                    <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                                                        <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                                            Identifiant
+                                                        </th>
+                                                        <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
+                                                            Nom
+                                                        </th>
+                                                        <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
+                                                            Description
+                                                        </th>
+                                                        <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
+                                                            Type de Cours
+                                                        </th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <template x-for="course in subscription.courses" :key="course.id">
+                                                        <tr>
+                                                            <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                                                <p class="text-black dark:text-white"
+                                                                   x-text="course.identifier"></p></td>
+                                                            <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                                                <p class="inline-flex px-3 py-1 text-sm font-medium text-success"
+                                                                   x-text="course.name"></p></td>
+                                                            <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                                                <p class="text-black dark:text-white"
+                                                                   x-text="course.description"></p></td>
+                                                            <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                                                <p class="text-black dark:text-white"
+                                                                   x-text="course.typeOfCourse"></p></td>
+                                                        </tr>
+                                                    </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- ====== courses Table End -->
-                            </div>
+                            </template>
                         </div>
-
-                        <% } %>
-
-
                     </div>
                 </div>
                 <!-- ====== Subscrition End -->
@@ -303,5 +260,45 @@
 </div>
 <!-- ===== Page Wrapper End ===== -->
 
-<script defer src="${pageContext.request.contextPath}/bundle.js"></script></body>
+</body>
+<script defer src="${pageContext.request.contextPath}/bundle.js"></script>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('learnerSubscriptions', () => ({
+            subscriptions: [],
+
+            init() {
+                window.refreshSubscriptions = this.fetchSubscriptions.bind(this);
+                this.fetchSubscriptions();
+            },
+
+            fetchSubscriptions() {
+                const url = `<%=Routes.LEARN_SUBCRIPTIONS%>?learnerId=${apprenant.id}`;
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.subscriptions = data;
+                    })
+                    .catch(error => console.error('Error:', error));
+            },
+
+            unSubcr(subscription) {
+                const data = {
+                    learnerId: '${apprenant.id}',
+                    subscriptionId: subscription.id,
+                    subscriptionName:subscription.name
+                };
+
+                window.unSubcrForm(data);
+            },
+        }));
+    });
+</script>
+
 </html>

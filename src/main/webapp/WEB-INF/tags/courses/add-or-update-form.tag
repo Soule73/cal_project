@@ -9,7 +9,9 @@
     Ajouter un cours
 </button>
 <div x-show="modalOpen" x-transition="" class="overflow-y-auto md:max-h-[80vh] fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5">
-    <div @click.outside="closeModal" class="w-full max-w-142.5  xl:max-w-4xl rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
+    <div @click.outside="closeModal"
+         :class="{'xl:max-w-4xl': !successMessage}"
+         class="w-full max-w-142.5  rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
         <h4 x-show="!successMessage" class=" mb-6 text-xl font-bold text-black dark:text-white">
             Langue : <c:out value="${language.name}"/> | <span x-text="formTitle"></span>
 
@@ -43,8 +45,7 @@
                             <option value="${level.id}">${level.name}</option>
                         </c:forEach>
                     </select>
-                    <span x-text="errors.level"
-                          style="color: red;"></span>
+                    <span x-text="errors.level" style="color: red;"></span>
                 </div>
                 <div class="mb-4 px-2">
                     <label for="level"
@@ -118,10 +119,10 @@
 
         <!-- Success Message -->
         <div id="successMessage"  x-show="successMessage"
-             class="flex w-full mb-4 border-l-6 border-[#34D399] bg-[#34D399] bg-opacity-[15%] px-7 py-8 shadow-md dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9"
+             class="flex w-full"
         >
             <div
-                    class="mr-5 flex w-max p-4 w-full  items-center justify-center rounded-full bg-[#34D399]"
+                    class="flex w-max w-max mx-auto p-4 w-full  items-center justify-center rounded-full bg-[#34D399]"
             >
                 <svg
                         width="56"
@@ -137,7 +138,7 @@
                     ></path>
                 </svg>
             </div>
-            <div class="w-full">
+            <div class="w-full ">
                 <h5
                         class="mb-3 text-lg font-bold text-black dark:text-[#34D399]"
                 >

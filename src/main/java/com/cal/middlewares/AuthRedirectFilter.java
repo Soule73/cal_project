@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {Routes.LOGIN,Routes.REGISTER})
+@WebFilter(urlPatterns = {Routes.LOGIN,
+//        Routes.REGISTER
+})
 public class AuthRedirectFilter implements Filter {
 
     @Override

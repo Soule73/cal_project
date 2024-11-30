@@ -1,6 +1,7 @@
-package com.cal.controlleurs.courses;
+package com.cal.controlleurs.rooms;
 
-import com.cal.models.Course;
+import com.cal.Routes;
+import com.cal.models.Room;
 import com.cal.utils.JsonData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -21,10 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.cal.Routes.COURSE_FORM;
-
-@WebServlet(urlPatterns = COURSE_FORM)
-public class CourseFormServlet extends HttpServlet {
+@WebServlet({Routes.ROOM_FORM})
+public class RoomFormServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
 
@@ -34,43 +33,41 @@ public class CourseFormServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
+        if (jsonObject == null) return;
 
-        if(jsonObject==null)return;
         Map<String, String> errors = new HashMap<>();
+        Room room = new Room();
 
-
-        Course course = new Course();
         try {
-
-            checkInpuValue(jsonObject, course);
+            setRoomFileds(jsonObject, room);
         } catch (Exception e) {
-
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             errors.put("global", "Données JSON invalides");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return;
         }
 
-
-        if (courseFormValition(response, errors, course)) return;
+        if (validateRoomForm(response, errors, room)) return;
 
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         try {
             transaction.begin();
-            em.persist(course);
+            em.persist(room);
             transaction.commit();
-            
-            em.refresh(course);
+
+            em.refresh(room);
 
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été ajouté avec succès!", "courseId", course.getId())).toString());
+            response.getWriter().write(new JSONObject(Map.of("message", "La salle a été ajouté avec succès!", "roomId", room.getId())).toString());
+
         } catch (Exception e) {
+
             if (transaction.isActive()) {
                 transaction.rollback();
             }
@@ -86,20 +83,20 @@ public class CourseFormServlet extends HttpServlet {
         }
     }
 
-
-
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
         if (jsonObject == null) return;
 
         Map<String, String> errors = new HashMap<>();
-        long courseId = jsonObject.optLong("id", 0);
-        if (courseId == 0) {
+
+        long roomId = jsonObject.optLong("id", 0);
+        if (roomId == 0) {
+
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID du cours manquant");
+            errors.put("id", "ID du salle manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
             return;
         }
@@ -109,34 +106,29 @@ public class CourseFormServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Course course = em.find(Course.class, courseId);
-            if (course == null) {
+            Room room = em.find(Room.class, roomId);
+
+            if (room == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Cours non trouvé");
+                errors.put("global", "Salle non trouvé");
                 response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
                 return;
             }
 
-            // Mettre à jour les attributs de l'objet Course
-            try {
+            setRoomFileds(jsonObject, room);
 
-                checkInpuValue(jsonObject, course);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                errors.put("global", "Données JSON invalides");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
+            if (validateRoomForm(response, errors, room)) return;
 
-            if (courseFormValition(response, errors, course)) return;
-
-            em.merge(course);
+            em.merge(room);
             transaction.commit();
 
+            em.refresh(room);
+
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été mis à jour avec succès!")).toString());
+            response.getWriter().write(new JSONObject(Map.of("message", "La salle a été mis à jour avec succès!")).toString());
 
         } catch (Exception e) {
+
             if (transaction.isActive()) {
                 transaction.rollback();
             }
@@ -152,65 +144,13 @@ public class CourseFormServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-
-        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
-        if (jsonObject == null) return;
-
-        Map<String, String> errors = new HashMap<>();
-
-        long courseId = jsonObject.optLong("id", 0);
-        if (courseId == 0) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID du cours manquant");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-            Course course = em.find(Course.class, courseId);
-            if (course == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Cours non trouvé");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
-
-            em.remove(course);
-            transaction.commit();
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Le cours a été supprimé avec succès!")).toString());
-        } catch (Exception e) {
-
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            errors.put("global", "Une erreur s'est produite lors de la suppression du cours.");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
-    }
-
-
-    private boolean courseFormValition(HttpServletResponse response, Map<String, String> errors, Course course) throws IOException {
+    private boolean validateRoomForm(HttpServletResponse response, Map<String, String> errors, Room room) throws IOException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<Course>> violations = validator.validate(course);
+        Set<ConstraintViolation<Room>> violations = validator.validate(room);
 
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<Course> violation : violations) {
+            for (ConstraintViolation<Room> violation : violations) {
                 errors.put(violation.getPropertyPath().toString(), violation.getMessage());
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -220,31 +160,63 @@ public class CourseFormServlet extends HttpServlet {
         return false;
     }
 
-
-    private void checkInpuValue(JSONObject jsonObject, Course course) {
-        if(jsonObject.has("level") && !jsonObject.optString("level", "").isEmpty()){
-            course.setLevelId(jsonObject.getLong("level"));
-        }
-
-        if(jsonObject.has("subscription") && !jsonObject.optString("subscription", "").isEmpty()){
-            course.setLevelId(jsonObject.getLong("level"));
-        }
-
-        if(jsonObject.has("languageId") && !jsonObject.optString("languageId", "").isEmpty()){
-            course.setLanguageId(jsonObject.getLong("languageId"));
-        }
-
-        if(jsonObject.has("room") && !jsonObject.optString("room", "").isEmpty()){
-
-            course.setRoomId(jsonObject.getLong("room"));
-        }
-
-        course.setName(jsonObject.getString("name"));
-
-        course.setIdentifier(jsonObject.getString("identifier"));
-        course.setDescription(jsonObject.optString("description"));
-        course.setSpecificEquipment(jsonObject.optString("specificEquipment"));
-        course.setTypeOfCourse(jsonObject.getString("typeOfCourse"));
+    private void setRoomFileds(JSONObject jsonObject, Room room) {
+        room.setName(jsonObject.getString("name"));
+        room.setName(jsonObject.getString("equipment"));
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
+        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
+        if (jsonObject == null) return;
+
+        Map<String, String> errors = new HashMap<>();
+
+
+        long roomId = jsonObject.optLong("id", 0);
+        if (roomId == 0) {
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            errors.put("id", "ID de la salle manquant");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return;
+        }
+
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            Room room = em.find(Room.class, roomId);
+            if (room == null) {
+
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                errors.put("global", "Salle non trouvé");
+                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+                return;
+            }
+
+            em.remove(room);
+            transaction.commit();
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write(new JSONObject(Map.of("message", "La salle a été supprimé avec succès!")).toString());
+
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            errors.put("global", "Une erreur s'est produite lors de la suppression du cours.");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+        }
+    }
 }

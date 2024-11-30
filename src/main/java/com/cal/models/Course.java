@@ -135,7 +135,15 @@ public class Course {
     }
 
     public void setLanguageId(Long languageId)
-    { this.language = new Language(); this.language.setId(languageId); }
+    {
+        this.language = new Language();
+        this.language.setId(languageId);
+    }
+    public void setRoomId(Long roomId)
+    {
+        this.room = new Room();
+        this.room.setId(roomId);
+    }
 
     public void setLevelId(Long levelId) {
         this.level = new Level();

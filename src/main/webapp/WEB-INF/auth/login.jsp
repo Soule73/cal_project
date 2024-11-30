@@ -152,12 +152,12 @@
                                     </div>
 
 
-                                    <div class="mt-6 text-center">
-                                        <p class="font-medium">
-                                            Vous n'avez pas de compte ?
-                                            <a href="${pageContext.request.contextPath}<%=Routes.REGISTER%>" class="text-primary"> Inscrivez-vous</a>
-                                        </p>
-                                    </div>
+<%--                                    <div class="mt-6 text-center">--%>
+<%--                                        <p class="font-medium">--%>
+<%--                                            Vous n'avez pas de compte ?--%>
+<%--                                            <a href="${pageContext.request.contextPath}<%=Routes.REGISTER%>" class="text-primary"> Inscrivez-vous</a>--%>
+<%--                                        </p>--%>
+<%--                                    </div>--%>
                                 </form>
                             </div>
                         </div>

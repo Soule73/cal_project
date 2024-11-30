@@ -77,7 +77,7 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('deleteCourseForm', () => ({
-            modalTitle:"êtes-vous sûr de vouloir supprimer",
+            modalTitle:"êtes-vous sûr de vouloir supprimer ?",
             submitBtnText:"supprimer",
             modalOpen: false,
             modalDesc: "",
@@ -105,7 +105,7 @@
                 console.log("course : "+course)
                 this.deltetForm = { ...course };
 
-                this.modalDesc ="Cours : "+ this.deltetForm.name;
+                this.modalDesc ="Le cours : "+ this.deltetForm.name;
                 this.modalOpen = true;
             },
 
