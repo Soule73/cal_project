@@ -137,7 +137,7 @@ public class SubscriptionFormServlet extends HttpServlet {
             }
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            errors.put("global", "Une erreur s'est produite lors de la mise à jour de l'abonnement.");
+            errors.put("global", "Une erreur s'est produite lors de la mise à jour de l'abonnement."+e.getMessage());
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
 
         } finally {
@@ -152,7 +152,7 @@ public class SubscriptionFormServlet extends HttpServlet {
 
         if(jsonObject.has("price") && !jsonObject.optString("price", "").isEmpty()){
 
-            subscription.setPrice(Double.parseDouble(jsonObject.getString("price")));
+            subscription.setPrice(Double.parseDouble(jsonObject.get("price").toString()));
         }
         subscription.setDescription(jsonObject.optString("description"));
         subscription.setAccessConditions(jsonObject.optString("accessConditions"));
@@ -203,7 +203,7 @@ public class SubscriptionFormServlet extends HttpServlet {
             }
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            errors.put("global", "Une erreur s'est produite lors de la mise à jour de l'abonnement.");
+            errors.put("global", "Une erreur s'est produite lors de la suppressions de l'abonnement.");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
 
         } finally {

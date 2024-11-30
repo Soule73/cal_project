@@ -48,7 +48,7 @@
                     <li>
                         <a
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
-                                href="<%=Routes.SUBCRIPTION_LIST%>"
+                                href="<%=Routes.LEARNER_LIST%>"
                                 @click="selected = (selected === 'listApprenants' ? '':'listApprenants')"
                                 :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listApprenants') }"
                                 :class="page === 'listApprenants' && 'bg-graydark'">
@@ -69,7 +69,7 @@
                         <a
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1
                                 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
-                                href="<%=Routes.SUBCRIPTION_LIST%>"
+                                href="<%=Routes.LANG_LIST%>"
                                 @click="selected = (selected === 'listLanguages' ? '':'listLanguages')"
                                 :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listLanguages') }"
                                 :class="page === 'listLanguages' && 'bg-graydark'">
