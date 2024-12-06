@@ -2,7 +2,7 @@ package com.cal.controlleurs.learners;
 
 
 import com.cal.models.Language;
-import com.cal.models.Learner;
+import com.cal.models.User;
 import com.cal.models.Level;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -37,12 +37,11 @@ public class LearnerListServlet extends HttpServlet {
 
         List<Language> languages;
         List<Level> levels;
-        languages = em.createQuery("SELECT l FROM Language l",Language.class).getResultList();
-        levels = em.createQuery("SELECT l FROM Level l",Level.class).getResultList();
+        languages = em.createQuery("SELECT l FROM Language l", Language.class).getResultList();
+        levels = em.createQuery("SELECT l FROM Level l", Level.class).getResultList();
         request.setAttribute("languages", languages);
         request.setAttribute("levels", levels);
-        request.getRequestDispatcher("WEB-INF/learner/list.jsp")
-               .forward(request, response);
+        request.getRequestDispatcher("WEB-INF/learner/list.jsp").forward(request, response);
         em.close();
     }
 
@@ -66,12 +65,12 @@ public class LearnerListServlet extends HttpServlet {
         String searchQuery = jsonObject.optString("searchQuery", "");
 
         try (EntityManager em = emf.createEntityManager()) {
-            String queryStr = "SELECT l FROM Learner l";
+            String queryStr = "SELECT u FROM User u JOIN u.roles r WHERE r.name = 'LEARNER'";
             if (!searchQuery.isEmpty()) {
-                queryStr += " WHERE (l.firstname LIKE :searchQuery OR l.lastname LIKE :searchQuery OR l.email LIKE :searchQuery)";
+                queryStr += " AND (u.firstname LIKE :searchQuery OR u.lastname LIKE :searchQuery OR u.email LIKE :searchQuery)";
             }
-            queryStr += " ORDER BY l.id";
-            TypedQuery<Learner> query = em.createQuery(queryStr, Learner.class)
+            queryStr += " ORDER BY u.id";
+            TypedQuery<User> query = em.createQuery(queryStr, User.class)
                     .setFirstResult((page - 1) * pageSize)
                     .setMaxResults(pageSize);
 
@@ -79,16 +78,13 @@ public class LearnerListServlet extends HttpServlet {
                 query.setParameter("searchQuery", "%" + searchQuery + "%");
             }
 
-            List<Learner> learners = query.getResultList();
-
-            // Forcer la mise à jour des entités learners et leurs relations
-            learners.forEach(em::refresh);
+            List<User> learners = query.getResultList();
 
             // Compter le nombre total d'apprenants pour la pagination
-            TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(l) FROM Learner l", Long.class);
+            TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = 'LEARNER'", Long.class);
             if (!searchQuery.isEmpty()) {
                 countQuery = em.createQuery(
-                        "SELECT COUNT(l) FROM Learner l WHERE (l.firstname LIKE :searchQuery OR l.lastname LIKE :searchQuery OR l.email LIKE :searchQuery)", Long.class
+                        "SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = 'LEARNER' AND (u.firstname LIKE :searchQuery OR u.lastname LIKE :searchQuery OR u.email LIKE :searchQuery)", Long.class
                 );
                 countQuery.setParameter("searchQuery", "%" + searchQuery + "%");
             }
@@ -98,7 +94,7 @@ public class LearnerListServlet extends HttpServlet {
             JSONObject result = new JSONObject();
             JSONArray learnersJsonArray = new JSONArray();
 
-            for (Learner learner : learners) {
+            for (User learner : learners) {
                 JSONObject learnerJson = getJsonObject(learner);
                 learnersJsonArray.put(learnerJson);
             }
@@ -115,7 +111,7 @@ public class LearnerListServlet extends HttpServlet {
         }
     }
 
-    private static JSONObject getJsonObject(Learner learner) {
+    private static JSONObject getJsonObject(User learner) {
         JSONObject learnerJson = new JSONObject();
         learnerJson.put("id", learner.getId());
         learnerJson.put("firstname", learner.getFirstname());
@@ -140,6 +136,4 @@ public class LearnerListServlet extends HttpServlet {
 
         return learnerJson;
     }
-
 }
-

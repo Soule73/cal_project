@@ -13,13 +13,12 @@ import org.mindrot.jbcrypt.BCrypt;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import java.io.IOException;
 
+
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-
 
     private EntityManagerFactory emf;
 
@@ -30,8 +29,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("WEB-INF/auth/login.jsp")
-                .forward(req, resp);
+        req.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(req, resp);
     }
 
     @Override
@@ -47,7 +45,7 @@ public class LoginServlet extends HttpServlet {
         try {
             user = query.getSingleResult();
         } catch (NoResultException e) {
-            request.setAttribute("error", "Utilisateur non trouve");
+            request.setAttribute("error", "Utilisateur non trouvé");
             request.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(request, response);
             return;
         }

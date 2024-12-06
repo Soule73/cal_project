@@ -8,16 +8,12 @@ public class LearnerSubscriptionId implements Serializable {
     private Long learner;
     private Long subscription;
 
-    // Default constructor
     public LearnerSubscriptionId() {}
 
-    // Parameterized constructor
     public LearnerSubscriptionId(Long learner, Long subscription) {
         this.learner = learner;
         this.subscription = subscription;
     }
-
-    // Getters, Setters, equals, and hashCode
 
     public Long getLearner() {
         return learner;

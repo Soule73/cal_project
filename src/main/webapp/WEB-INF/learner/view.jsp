@@ -1,4 +1,4 @@
-<%@ page import="com.cal.models.Learner" %>
+<%@ page import="com.cal.models.User" %>
 
 <%@ page import="com.cal.Routes" %>
 
@@ -8,7 +8,7 @@
 
 
 <%
-    Learner apprenant = (Learner) request.getAttribute("apprenant");
+    User apprenant = (User) request.getAttribute("apprenant");
 
 %>
 

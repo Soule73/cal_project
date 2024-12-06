@@ -22,16 +22,6 @@ public class SecurityHeadersFilter implements Filter {
         httpResponse.setHeader("X-Content-Type-Options", "nosniff");
         httpResponse.setHeader("X-Frame-Options", "DENY");
         httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-/*        httpResponse.setHeader("Content-Security-Policy",
-                "default-src 'self'; " +
-                        "style-src 'self' 'unsafe-inline' *; " +
-                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' *; " +
-                        "img-src 'self' data: *; " +
-                        "font-src 'self' *; " +
-                        "connect-src 'self' *; " +
-                        "media-src 'self' *; " +
-                        "object-src 'none'; " +
-                        "frame-src 'self' *;");*/
 
         chain.doFilter(request, response);
     }

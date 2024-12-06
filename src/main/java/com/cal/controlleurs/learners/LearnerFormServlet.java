@@ -1,7 +1,10 @@
 package com.cal.controlleurs.learners;
 
 import com.cal.Routes;
-import com.cal.models.Learner;
+import com.cal.models.Role;
+import com.cal.models.User;
+import com.cal.models.UserRole;
+import com.cal.models.UserRoleId;
 import com.cal.utils.JsonData;
 import com.cal.utils.ValidationUtils;
 import jakarta.persistence.EntityManager;
@@ -19,6 +22,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @WebServlet(Routes.LEARNER_FORM)
 public class LearnerFormServlet extends HttpServlet {
@@ -36,7 +40,7 @@ public class LearnerFormServlet extends HttpServlet {
         if (jsonObject == null) return;
 
         Map<String, String> errors = new HashMap<>();
-        Learner learner = new Learner();
+        User learner = new User();
         try {
             checkInputValue(jsonObject, learner);
         } catch (Exception e) {
@@ -53,7 +57,19 @@ public class LearnerFormServlet extends HttpServlet {
 
         try {
             transaction.begin();
+
+            // Persister l'apprenant
             em.persist(learner);
+            em.flush(); // Assurez-vous que l'apprenant a un ID assigné
+
+            // Assigner le rôle LEARNER en créant un objet UserRole
+            Role learnerRole = em.createQuery("SELECT r FROM Role r WHERE r.name = 'LEARNER'", Role.class).getSingleResult();
+            UserRole userRole = new UserRole();
+            userRole.setId(new UserRoleId(learner.getId(), learnerRole.getId()));
+            userRole.setUser(learner);
+            userRole.setRole(learnerRole);
+            em.persist(userRole);
+
             transaction.commit();
             em.refresh(learner);
 
@@ -87,7 +103,7 @@ public class LearnerFormServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Learner learner = em.find(Learner.class, learnerId);
+            User learner = em.find(User.class, learnerId);
             if (learner == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 errors.put("global", "Apprenant non trouvé");
@@ -139,7 +155,7 @@ public class LearnerFormServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Learner learner = em.find(Learner.class, learnerId);
+            User learner = em.find(User.class, learnerId);
             if (learner == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 errors.put("global", "Apprenant non trouvé");
@@ -161,14 +177,14 @@ public class LearnerFormServlet extends HttpServlet {
         }
     }
 
-    private void checkInputValue(JSONObject jsonObject, Learner learner) {
+    private void checkInputValue(JSONObject jsonObject, User learner) {
         learner.setFirstname(jsonObject.getString("firstname"));
         learner.setLastname(jsonObject.getString("lastname"));
         learner.setEmail(jsonObject.optString("email"));
         learner.setCreatedAt(new Date());
     }
 
-    private void handleException(HttpServletResponse response, Map<String, String> errors,EntityManager em, Exception e) throws IOException {
+    private void handleException(HttpServletResponse response, Map<String, String> errors, EntityManager em, Exception e) throws IOException {
         if (em.getTransaction().isActive()) {
             em.getTransaction().rollback();
         }
@@ -182,6 +198,7 @@ public class LearnerFormServlet extends HttpServlet {
             errors.put("email", "L'email est déjà utilisé");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
+            System.out.print(e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             errors.put("global", "Une erreur s'est produite lors du traitement de la requête");
         }

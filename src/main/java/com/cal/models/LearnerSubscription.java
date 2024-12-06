@@ -1,17 +1,20 @@
 package com.cal.models;
 
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "learner_subscription")
 @IdClass(LearnerSubscriptionId.class)
-public class LearnerSubscription {
+public class LearnerSubscription implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "learner_id", nullable = false)
-    private Learner learner;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User learner;
 
     @Id
     @ManyToOne
@@ -28,11 +31,11 @@ public class LearnerSubscription {
 
     // Getters and Setters
 
-    public Learner getLearner() {
+    public User getLearner() {
         return learner;
     }
 
-    public void setLearner(Learner learner) {
+    public void setLearner(User learner) {
         this.learner = learner;
     }
 

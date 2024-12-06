@@ -1,11 +1,14 @@
 package com.cal.models;
 
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "messages")
-public class Message {
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +22,8 @@ public class Message {
     private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "learner_id", nullable = false)
-    private Learner learner;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User learner;
 
     // Getters and Setters
 
@@ -48,11 +51,11 @@ public class Message {
         this.createdAt = createdAt;
     }
 
-    public Learner getLearner() {
+    public User getLearner() {
         return learner;
     }
 
-    public void setLearner(Learner learner) {
+    public void setLearner(User learner) {
         this.learner = learner;
     }
 }

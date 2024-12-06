@@ -1,7 +1,7 @@
 package com.cal.controlleurs.learners;
 
 import com.cal.models.Course;
-import com.cal.models.Learner;
+import com.cal.models.User;
 import com.cal.models.LearnerSubscription;
 import com.cal.models.Subscription;
 import com.cal.utils.JsonData;
@@ -36,7 +36,7 @@ public class LearnerSubscriptionServlet extends HttpServlet {
         Long learnerId = Long.parseLong(request.getParameter("learnerId"));
         EntityManager em = emf.createEntityManager();
         try {
-            Learner learner = em.find(Learner.class, learnerId);
+            User learner = em.find(User.class, learnerId);
             if (learner == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Learner not found");
                 return;
@@ -76,7 +76,7 @@ public class LearnerSubscriptionServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Learner learner = em.find(Learner.class, learnerId);
+            User learner = em.find(User.class, learnerId);
             Subscription subscription = em.find(Subscription.class, subscriptionId);
 
             if (learner == null || subscription == null) {
@@ -126,7 +126,7 @@ public class LearnerSubscriptionServlet extends HttpServlet {
 
         try {
             transaction.begin();
-            Learner learner = em.find(Learner.class, learnerId);
+            User learner = em.find(User.class, learnerId);
             Subscription subscription = em.find(Subscription.class, subscriptionId);
 
             if (learner == null || subscription == null) {

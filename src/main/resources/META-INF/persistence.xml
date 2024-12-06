@@ -10,16 +10,16 @@
     <persistence-unit name="languageCenterPU">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>com.cal.models.User</class>
-        <class>com.cal.models.Learner</class>
+        <class>com.cal.models.User</class>
         <class>com.cal.models.Course</class>
         <class>com.cal.models.Language</class>
         <class>com.cal.models.Subscription</class>
         <class>com.cal.models.Level</class>
         <class>com.cal.models.Message</class>
         <class>com.cal.models.Room</class>
-        <class>com.cal.models.LearnerLanguage</class>
+        <class>com.cal.models.Role</class>
+        <class>com.cal.models.UserRole</class>
         <class>com.cal.models.LearnerSubscription</class>
-        <class>com.cal.models.SessionEntity</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/cal_db"/>
