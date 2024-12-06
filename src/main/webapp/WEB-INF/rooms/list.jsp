@@ -127,7 +127,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div>
+                        <div class=" mt-4">
                             <button @click="prevPage" :disabled="page === 1"
                                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md">Précédent</button>
                             <span x-text="page" class="px-4 py-2"></span>
@@ -147,7 +147,7 @@
     <!-- ===== Content Area End ===== -->
 </div>
 <!-- ===== Page Wrapper End ===== -->
-<script defer src="${pageContext.request.contextPath}/bundle.js"></script>
+<tg:footer/>
 
 <script>
     document.addEventListener('alpine:init', () => {

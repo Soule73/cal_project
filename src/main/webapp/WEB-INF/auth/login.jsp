@@ -63,7 +63,7 @@
                                     Se connecter
                                 </h2>
                                 <% if (request.getAttribute("error") != null) { %>
-                                <div style="color: red;"><%= request.getAttribute("error") %></div>
+                                <div class=" text-red-600"><%= request.getAttribute("error") %></div>
                                 <% } %>
                                 <form action="${pageContext.request.contextPath}<%=Routes.LOGIN%>" method="post">
 
@@ -171,7 +171,8 @@
     <!-- ===== Content Area End ===== -->
 </div>
 <!-- ===== Page Wrapper End ===== -->
-<script defer src="${pageContext.request.contextPath}/bundle.js"></script>
+<tg:footer/>
+
 </body>
 
 </html>

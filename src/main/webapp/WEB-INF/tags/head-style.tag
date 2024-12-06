@@ -8,7 +8,8 @@
     <title>${title} - CAL</title>
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
 
-    <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
+    <link href="../../build/style.css" rel="stylesheet">
+<%--    <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">--%>
     <jsp:doBody />
     <script>
         // Fonction pour masquer le message après 5 secondes
@@ -19,7 +20,6 @@
                     element.style.display = 'none';
                 }
             }, 5000);
-            // 5000 millisecondes = 5 secondes
         }
     </script>
 </head>

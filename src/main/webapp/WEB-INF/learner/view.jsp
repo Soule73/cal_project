@@ -16,8 +16,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <tg:head-style title="Détails de l'Apprenant"/>
-
 <body
+
         x-data="{ page: 'viewApprenant', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
           darkMode = JSON.parse(localStorage.getItem('darkMode'));
@@ -261,7 +261,7 @@
 <!-- ===== Page Wrapper End ===== -->
 
 </body>
-<script defer src="${pageContext.request.contextPath}/bundle.js"></script>
+<tg:footer/>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('learnerSubscriptions', () => ({
