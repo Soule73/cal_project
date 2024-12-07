@@ -47,12 +47,10 @@
 
 
                 <!-- ====== Table Section Start -->
-                <div class="flex flex-col gap-10"
-                     x-data="dataTable()" x-ref="learnersTable" x-init="init">
-
+                <div class="flex flex-col gap-10" x-data="dataTable">
 
                     <!-- ====== Table Three Start -->
-                    <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1" x-data="dataTable()">
+                    <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
                         <div class="flex flex-wrap justify-between items-center pb-2 ">
 
                             <div class=" max-w-md ">
@@ -184,7 +182,6 @@
             },
 
             fetchData() {
-                // Empêcher les appels multiples si une requête est déjà en cours
                 if (this.isFetching) return;
                 this.isFetching = true;
 
@@ -195,8 +192,6 @@
                     searchQuery: this.searchQuery
                 };
 
-                console.log("Sending data:", data); // Pour vérifier les données envoyées
-
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -206,7 +201,6 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data)
                         this.learners = data.learners;
                         this.totalLearners = data.totalLearners;
                         this.page = data.page;
@@ -242,7 +236,7 @@
                     id: learner.id,
                     name: learner.firstname + ' ' + learner.lastname,
                 };
-                // Remplir le formulaire de suppression avec les valeurs de l'apprenant sélectionné
+
                 window.deleteLearnerForm(data);
             },
 

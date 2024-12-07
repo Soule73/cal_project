@@ -118,7 +118,6 @@
                             this.errors = data.errors;
                             console.log(data.errors)
                         } else {
-                            this.resetForm();
                             this.successMessage = this.form.id ? "L'abonnement a été mis à jour avec succès!" : "L'abonnement a été ajouté avec succès!";
                             // Appeler la méthode globale pour rafraîchir les abonnements
                             window.refreshSubscriptions();

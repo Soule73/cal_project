@@ -102,7 +102,6 @@
                             console.log("Errors received:", this.errors);
                         } else {
                             const msg = this.form.id ? 'modifiée' : 'ajoutée';
-                            this.resetForm();
                             this.successMessage = "La langue a été " + msg + " avec succès!";
                             // Appeler la méthode globale pour rafraîchir les langues
                             window.refreshLanguages();

@@ -50,7 +50,7 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="<%=Routes.LEARNER_LIST%>"
                                 @click="selected = (selected === 'listApprenants' ? '':'listApprenants')"
-                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listApprenants') }"
+                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listApprenants') || (page === 'listApprenants') }"
                                 :class="page === 'listApprenants' && 'bg-graydark'">
 
                             <svg
@@ -71,7 +71,7 @@
                                 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="<%=Routes.LANG_LIST%>"
                                 @click="selected = (selected === 'listLanguages' ? '':'listLanguages')"
-                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listLanguages') }"
+                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listLanguages') || (page === 'listLanguages') }"
                                 :class="page === 'listLanguages' && 'bg-graydark'">
                             <svg
                                     width="18"
@@ -89,7 +89,7 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="<%=Routes.ROOM_LIST%>"
                                 @click="selected = (selected === 'listRooms' ? '':'listRooms')"
-                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listRooms') && (page === 'listRooms') }"
+                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listRooms') || (page === 'listRooms') }"
                                 :class="page === 'profile' && 'bg-graydark'">
 
                             <svg
@@ -110,7 +110,7 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="<%=Routes.SUBCRIPTION_LIST%>"
                                 @click="selected = (selected === 'listSubscriptions' ? '':'listSubscriptions')"
-                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listSubscriptions') && (page === 'listSubscriptions') }"
+                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'listSubscriptions') || (page === 'listSubscriptions') }"
                                 :class="page === 'profile' && 'bg-graydark'">
                             <svg
                                     width="18"

@@ -179,7 +179,6 @@
                             console.log("Errors received:", this.errors);
                         } else {
                             const msg = this.form.id ? 'modifié' : 'ajouté';
-                            this.resetForm();
                             this.successMessage = "L'apprenant a été " + msg + " avec succès!";
                             // Appeler la méthode globale pour rafraîchir les apprenants
                             window.refreshLearners();

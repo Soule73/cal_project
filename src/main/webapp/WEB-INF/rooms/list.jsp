@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="tg" tagdir="/WEB-INF/tags" %>
-<%@ taglib prefix="tgl" tagdir="/WEB-INF/tags/rooms" %>
+<%@ taglib prefix="tgr" tagdir="/WEB-INF/tags/rooms" %>
 
 <%@ page import="com.cal.Routes" %>
 <!DOCTYPE html>
@@ -41,22 +41,21 @@
                 <!-- Breadcrumb Start -->
                 <tg:breadcrumb name="Liste des Salles"/>
                 <!-- Breadcrumb End -->
-                <tgl:alerte-delete-modal/>
+                <tgr:alerte-delete-modal/>
 
                 <!-- ====== Table Section Start -->
-                <div class="flex flex-col gap-10" x-data="roomDataTable()" x-ref="roomsTable"
-                     x-init="init">
+                <div class="flex flex-col gap-10" x-data="roomDataTable">
                     <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
                         <div class="flex flex-wrap justify-between items-center pb-2">
                             <div class="max-w-md">
                                 <input
                                         class="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                        x-model="searchQuery" @input.debounce.500="fetchData"
+                                        x-model="searchQuery" @input.debounce.500="fetchRooms"
                                         placeholder="Recherche..." type="search"
                                         title="Search within table">
                             </div>
                             <div></div>
-                            <tgl:add-or-update-form />
+                            <tgr:add-or-update-form />
                         </div>
                         <div class="max-w-full overflow-x-auto">
                             <table class="w-full table-auto">

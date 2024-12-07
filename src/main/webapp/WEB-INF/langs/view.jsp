@@ -177,7 +177,7 @@
 </div>
 <!-- ===== Page Wrapper End ===== -->
 
-<tg:footer/>>
+<tg:footer/>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('dataTable', () => ({
@@ -193,7 +193,6 @@
             },
 
             fetchData() {
-                // Empêcher les appels multiples si une requête est déjà en cours
                 if (this.isFetching) return;
                 this.isFetching = true;
 
@@ -205,7 +204,6 @@
                     searchQuery: this.searchQuery
                 };
 
-                console.log("Sending data:", data); // Pour vérifier les données envoyées
 
                 fetch(url, {
                     method: 'POST',
@@ -216,7 +214,6 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data)
                         this.courses = data.courses;
                         this.totalCourses = data.totalCourses;
                         this.page = data.page;
@@ -248,7 +245,6 @@
                     specificEquipment: course.specificEquipment,
                     typeOfCourse: course.typeOfCourse,
                 };
-                // Remplir le formulaire de modification avec les valeurs du cours sélectionné
                 window.courseForm(data);
             },
             deleteCourse(course) {
@@ -256,7 +252,6 @@
                     id: course.id,
                     name: course.name,
                 };
-                // Remplir le formulaire de modification avec les valeurs du cours sélectionné
                 window.deleteCourseForm(data);
             },
 

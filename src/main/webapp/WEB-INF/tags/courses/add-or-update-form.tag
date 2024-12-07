@@ -241,7 +241,6 @@
                             console.log("Errors received:", this.errors);
                         } else {
                             const msg= this.form.id ? 'modifié' : 'ajouté';
-                            this.resetForm();
                             this.successMessage = "Le cours a été "+msg+" avec succès!";
                             // Appeler la méthode globale pour rafraîchir les cours
                             window.refreshCourses();

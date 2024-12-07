@@ -105,7 +105,6 @@
                         if (data.errors) {
                             this.errors = data.errors;
                         } else {
-                            this.resetForm();
                             this.successMessage = this.form.id ? "La salle a été mise à jour avec succès!" : "La salle a été ajoutée avec succès!";
                             // Appeler la méthode globale pour rafraîchir les salles
                             window.refreshRooms();

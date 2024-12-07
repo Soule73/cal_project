@@ -8,7 +8,7 @@
     <title>${title} - CAL</title>
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
 
-    <link href="../../build/style.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/build/style.css" rel="stylesheet">
 <%--    <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">--%>
     <jsp:doBody />
     <script>

@@ -162,7 +162,7 @@ public class RoomFormServlet extends HttpServlet {
 
     private void setRoomFileds(JSONObject jsonObject, Room room) {
         room.setName(jsonObject.getString("name"));
-        room.setName(jsonObject.getString("equipment"));
+        room.setEquipment(jsonObject.getString("equipment"));
     }
 
     @Override

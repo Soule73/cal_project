@@ -44,8 +44,7 @@
                 <tgs:alerte-delete-modal/>
 
                 <!-- ====== Table Section Start -->
-                <div class="flex flex-col gap-10" x-data="subscriptionDataTable()" x-init="fetchSubscriptions()"
-                     x-init="init">
+                <div class="flex flex-col gap-10" x-data="subscriptionDataTable">
                     <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
                         <div class="flex flex-wrap justify-between items-center pb-2">
                             <div class="max-w-md">

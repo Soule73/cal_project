@@ -91,6 +91,8 @@ public class User implements Serializable {
 
     public String getEmail() {
         return email;
+    }    public String getFullname() {
+        return firstname+" "+lastname;
     }
 
     public void setEmail(String email) {
