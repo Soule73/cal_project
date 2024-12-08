@@ -45,7 +45,7 @@
                             <option value="${level.id}">${level.name}</option>
                         </c:forEach>
                     </select>
-                    <span x-text="errors.level" style="color: red;"></span>
+                    <span x-text="errors.level" class=" text-red-600" ></span>
                 </div>
                 <div class="mb-4 px-2">
                     <label for="level"
@@ -60,7 +60,7 @@
                         </c:forEach>
                     </select>
                     <span x-text="errors.room"
-                          style="color: red;"></span>
+                          class=" text-red-600"></span>
                 </div>
                 <div class="mb-4 px-2">
                     <label for="subscription"
@@ -76,7 +76,7 @@
                         </c:forEach>
                     </select>
                     <span x-text="errors.subscription"
-                          style="color: red;"></span>
+                          class=" text-red-600"></span>
                 </div>
                 <tg:x-input-form
                         label="Type de Cours"

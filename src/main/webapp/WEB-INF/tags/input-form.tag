@@ -31,6 +31,6 @@
                 dark:bg-form-input dark:text-white dark:focus:border-primary"/>
 
     <% if (request.getAttribute("errors") != null && ((Map<String, String>) request.getAttribute("errors")).containsKey(name)) { %>
-    <span style="color: red;"><%= ((Map<String, String>) request.getAttribute("errors")).get(name) %></span>
+    <span class=" text-red-600"><%= ((Map<String, String>) request.getAttribute("errors")).get(name) %></span>
     <% } %>
 </div>

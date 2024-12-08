@@ -21,6 +21,7 @@
         x-data="{ page: 'viewApprenant', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
           darkMode = JSON.parse(localStorage.getItem('darkMode'));
+          selected = 'viewApprenant';
           $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
         :class="{'dark text-bodydark bg-boxdark-2': darkMode === true}">
 <!-- ===== Preloader Start ===== -->
@@ -174,7 +175,7 @@
                 <!-- ====== languages Table End -->
 
                 <!-- ====== Subscrition Start -->
-                <div x-data="learnerSubscriptions()" x-cloak>
+                <div x-data="learnerSubscriptions" x-cloak>
                     <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
                         <div class=" flex justify-between ">
                             <h4 class="mb-6 text-xl font-bold text-black dark:text-white">Abonnements</h4>

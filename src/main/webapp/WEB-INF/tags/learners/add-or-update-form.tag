@@ -40,7 +40,7 @@
                             <option value="${level.id}">${level.name}</option>
                         </c:forEach>
                     </select>
-                    <span x-text="errors.level" style="color: red;"></span>
+                    <span x-text="errors.level" class=" text-red-600"></span>
                 </div>
                 <div class="mb-4 px-2">
                     <label for="languageId"
@@ -55,7 +55,7 @@
                             <option value="${language.id}">${language.name}</option>
                         </c:forEach>
                     </select>
-                    <span x-text="errors.language" style="color: red;"></span>
+                    <span x-text="errors.language" class=" text-red-600"></span>
                 </div>
                 <div class="flex justify-end">
                     <button x-text="submitBtnText" type="submit" class="block w-full w-max rounded border border-primary bg-primary p-3 text-center font-medium text-white transition hover:bg-opacity-90">

@@ -12,6 +12,7 @@
         x-data="{ page: 'listApprenants', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
           darkMode = JSON.parse(localStorage.getItem('darkMode'));
+          selected = 'listApprenants';
           $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
         :class="{'dark text-bodydark bg-boxdark-2': darkMode === true}">
 <!-- ===== Preloader Start ===== -->
@@ -148,7 +149,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class=" mt-4">
+                        <div class=" my-2">
                             <button @click="prevPage" :disabled="page === 1" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md">Précédent</button>
                             <span x-text="page" class="px-4 py-2"></span>
                             <button @click="nextPage" :disabled="page >= totalPages" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md">Suivant</button>
@@ -166,7 +167,7 @@
 </div>
 <!-- ===== Page Wrapper End ===== -->
 </body>
-<tg:footer/>>
+<tg:footer/>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('dataTable', () => ({

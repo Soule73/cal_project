@@ -34,7 +34,7 @@
             <button @click="modalOpen = true" class="rounded-md bg-primary px-9 py-3 font-medium text-white">
                 Modal 2
             </button>
-            <div x-show="modalOpen" x-transition="" class="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5" style="display: none;">
+            <div x-show="modalOpen" x-transition="" class="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5" x-cloak>
                 <div @click.outside="modalOpen = false" class="w-full max-w-142.5 rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
     <span class="mx-auto inline-block">
       <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -69,7 +69,7 @@
             <button @click="modalOpen = true" class="rounded-md bg-primary px-9 py-3 font-medium text-white">
                 Modal 3
             </button>
-            <div x-show="modalOpen" x-transition="" class="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5" style="display: none;">
+            <div x-show="modalOpen" x-transition="" class="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5" x-cloak>
                 <div @click.outside="modalOpen = false" class="relative w-full max-w-142.5 rounded-lg bg-primary px-8 py-12 text-center md:px-17.5 md:py-15">
     <span class="mx-auto inline-block">
       <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">

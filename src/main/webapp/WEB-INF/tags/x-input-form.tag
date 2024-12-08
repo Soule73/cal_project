@@ -44,5 +44,5 @@
                     dark:bg-form-input dark:text-white dark:focus:border-primary"/>
     <% } %>
 
-    <span x-text="errors.<%= name %>" style="color: red;"></span>
+    <span x-text="errors.<%= name %>" class=" text-red-600"></span>
 </div>

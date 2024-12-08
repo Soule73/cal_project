@@ -6,9 +6,9 @@
     <button @click="openModal" class="rounded-md bg-primary px-9 py-3 font-medium text-white">
         Ajouter un abonnement
     </button>
-    <div x-show="modalOpen" x-transition=""
+    <div x-show="modalOpen" x-transition="" x-cloak
          class="fixed left-0 top-0 z-999999 flex h-full min-h-screen w-full items-center justify-center bg-black/90 px-4 py-5"
-         style="display: none;">
+        >
         <div @click.outside="closeModal"
              class="w-full w-max rounded-lg bg-white px-8 py-12 text-center dark:bg-boxdark md:px-17.5 md:py-15">
             <h4 x-show="!successMessage" class="mb-6 text-xl font-bold text-black dark:text-white">Abonnements
