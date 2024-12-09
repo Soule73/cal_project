@@ -5,7 +5,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tgl" tagdir="/WEB-INF/tags/learners" %>
-
+<%
+    User currentUser = (User) session.getAttribute("user");
+    boolean isAdmin = currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"));
+%>
 
 <%
     User apprenant = (User) request.getAttribute("apprenant");
@@ -15,10 +18,10 @@
 <%@ taglib prefix="tg" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html lang="fr">
-<tg:head-style title="Détails de l'Apprenant"/>
+<tg:head-style title='${isAdmin ? "Détails de l\'Apprenant":"Mon Profile"}'/>
 <body
 
-        x-data="{ page: 'viewApprenant', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
+        x-data="{ page: '<%= isAdmin ? "viewApprenant":"monProfil"%>', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
           darkMode = JSON.parse(localStorage.getItem('darkMode'));
           selected = 'viewApprenant';
@@ -46,7 +49,10 @@
         <main>
             <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
                 <!-- Breadcrumb Start -->
+                <%
+                if(isAdmin){ %>
                 <tg:breadcrumb name="Détails de l'Apprenant"/>
+                <% }%>
                 <!-- Breadcrumb End -->
                 <tgl:unsub-form/>
                 <!-- ====== Profile Section Start -->
