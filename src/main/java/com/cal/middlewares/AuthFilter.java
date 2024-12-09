@@ -1,6 +1,8 @@
 package com.cal.middlewares;
 
 import com.cal.Routes;
+import com.cal.models.User;
+import com.cal.utils.Permission;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +15,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import jakarta.servlet.FilterConfig;
+
 @WebFilter(urlPatterns = {
         Routes.LEARNER_LIST,
         Routes.LEARNER_SHOW,
@@ -24,13 +28,12 @@ import java.io.IOException;
         Routes.LANG_SHOW,
         Routes.COURSE_FORM,
         Routes.LOGOUT,
-        Routes.LOGOUT,
         Routes.ROOM_LIST,
         Routes.ROOM_FORM,
-        Routes.COURSE_FORM,
         Routes.SUBCRIPTION_LIST,
+        Routes.MESSAGE,
         Routes.SUBCRIPTION_FORM,
-
+        Routes.CURRENT_LEARNER
 })
 public class AuthFilter implements Filter {
 
@@ -43,9 +46,42 @@ public class AuthFilter implements Filter {
 
         if (session == null || session.getAttribute("user") == null) {
             httpResponse.sendRedirect(Routes.LOGIN);
-        } else {
-            chain.doFilter(request, response);
+            return;
         }
+
+        User currentUser = (User) session.getAttribute("user");
+        String path = httpRequest.getServletPath();
+
+        if (isAdminRoute(path)) {
+            if (Permission.hasRole(currentUser, "ADMIN")) {
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
+                return;
+            }
+        } else if (Routes.CURRENT_LEARNER.equals(path)) {
+            if (Permission.hasRole(currentUser, "LEARNER")) {
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
+                return;
+            }
+        } else if (isLearnerAndAdminRoute(path)) {
+            if (Permission.hasRole(currentUser, "LEARNER") && Permission.hasRole(currentUser, "ADMIN")) {
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
+                return;
+            }
+        }
+
+        chain.doFilter(request, response);
     }
+
+    private boolean isAdminRoute(String path) {
+        return path.equals(Routes.LEARNER_LIST) || path.equals(Routes.LEARNER_FORM) || path.equals(Routes.LEARNER_SHOW)
+                || path.equals(Routes.LANG_LIST) || path.equals(Routes.LANG_FORM) || path.equals(Routes.LANG_SHOW)
+                || path.equals(Routes.LANG_COURSE) || path.equals(Routes.ROOM_LIST) || path.equals(Routes.ROOM_FORM)
+                || path.equals(Routes.COURSE_FORM) || path.equals(Routes.SUBCRIPTION_LIST) || path.equals(Routes.SUBCRIPTION_FORM);
+    }
+
+    private boolean isLearnerAndAdminRoute(String path) {
+        return path.equals(Routes.LEARN_SUBCRIPTIONS);
+    }
+
 
 }

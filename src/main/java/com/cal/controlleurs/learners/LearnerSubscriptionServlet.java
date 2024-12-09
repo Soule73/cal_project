@@ -17,7 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 import static com.cal.Routes.LEARN_SUBCRIPTIONS;
 
@@ -36,24 +36,67 @@ public class LearnerSubscriptionServlet extends HttpServlet {
         Long learnerId = Long.parseLong(request.getParameter("learnerId"));
         EntityManager em = emf.createEntityManager();
         try {
+            String learnerSubscriptionJpql = "SELECT ls FROM LearnerSubscription ls " +
+                    "JOIN FETCH ls.subscription s " +
+                    "WHERE ls.learner.id = :learnerId";
+
+            List<LearnerSubscription> subscriptions = em.createQuery(learnerSubscriptionJpql, LearnerSubscription.class)
+                    .setParameter("learnerId", learnerId)
+                    .getResultList();
+
             User learner = em.find(User.class, learnerId);
             if (learner == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Learner not found");
                 return;
             }
 
-            em.refresh(learner);
-            // Forcer la mise à jour des abonnements
-            learner.getLearnerSubscriptions().forEach(ls -> em.refresh(ls.getSubscription()));
-
-            Set<LearnerSubscription> subscriptions = learner.getLearnerSubscriptions();
-            JSONArray subscriptionsJson = getSubscriptionsJson(subscriptions);
+            JSONArray subscriptionsJson = getSubscriptionsJson(subscriptions, learner, em);
 
             response.setContentType("application/json");
             response.getWriter().write(subscriptionsJson.toString());
         } finally {
             em.close();
         }
+    }
+
+    private JSONArray getSubscriptionsJson(List<LearnerSubscription> subscriptions, User learner, EntityManager em) {
+        JSONArray jsonArray = new JSONArray();
+        for (LearnerSubscription learnerSubscription : subscriptions) {
+            JSONObject json = new JSONObject();
+            json.put("id", learnerSubscription.getSubscription().getId());
+            json.put("name", learnerSubscription.getSubscription().getName());
+            json.put("description", learnerSubscription.getSubscription().getDescription());
+
+            // Récupérer les cours correspondant à la langue et au niveau de l'apprenant
+            String coursesJpql = "SELECT c FROM Course c " +
+                    "WHERE c.subscription.id = :subscriptionId " +
+                    "AND c.language.id = :languageId " +
+                    "AND c.level.id = :levelId";
+
+            List<Course> courses = em.createQuery(coursesJpql, Course.class)
+                    .setParameter("subscriptionId", learnerSubscription.getSubscription().getId())
+                    .setParameter("languageId", learner.getLanguage().getId())
+                    .setParameter("levelId", learner.getLevel().getId())
+                    .getResultList();
+
+            json.put("courses", getCoursesJson(courses));
+            jsonArray.put(json);
+        }
+        return jsonArray;
+    }
+
+    private JSONArray getCoursesJson(List<Course> courses) {
+        JSONArray jsonArray = new JSONArray();
+        for (Course course : courses) {
+            JSONObject json = new JSONObject();
+            json.put("id", course.getId());
+            json.put("identifier", course.getIdentifier());
+            json.put("name", course.getName());
+            json.put("description", course.getDescription());
+            json.put("typeOfCourse", course.getTypeOfCourse());
+            jsonArray.put(json);
+        }
+        return jsonArray;
     }
 
 
@@ -159,31 +202,5 @@ public class LearnerSubscriptionServlet extends HttpServlet {
         }
     }
 
-    private JSONArray getSubscriptionsJson(Set<LearnerSubscription> subscriptions) {
-        JSONArray jsonArray = new JSONArray();
-        for (LearnerSubscription learnerSubscription : subscriptions) {
-            JSONObject json = new JSONObject();
-            json.put("id", learnerSubscription.getSubscription().getId());
-            json.put("name", learnerSubscription.getSubscription().getName());
-            json.put("description", learnerSubscription.getSubscription().getDescription());
-            json.put("courses", getCoursesJson(learnerSubscription.getSubscription().getCourses()));
-            jsonArray.put(json);
-        }
-        return jsonArray;
-    }
-
-    private JSONArray getCoursesJson(Set<Course> courses) {
-        JSONArray jsonArray = new JSONArray();
-        for (Course course : courses) {
-            JSONObject json = new JSONObject();
-            json.put("id", course.getId());
-            json.put("identifier", course.getIdentifier());
-            json.put("name", course.getName());
-            json.put("description", course.getDescription());
-            json.put("typeOfCourse", course.getTypeOfCourse());
-            jsonArray.put(json);
-        }
-        return jsonArray;
-    }
 }
 

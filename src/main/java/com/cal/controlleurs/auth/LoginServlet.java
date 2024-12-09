@@ -16,6 +16,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import java.io.IOException;
 
+import static com.cal.utils.Permission.hasRole;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -44,16 +45,33 @@ public class LoginServlet extends HttpServlet {
         User user;
         try {
             user = query.getSingleResult();
+            em.refresh(user);
         } catch (NoResultException e) {
-            request.setAttribute("error", "Utilisateur non trouvé");
+            request.setAttribute("error", "Utilisateur non trouvé.");
             request.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(request, response);
             return;
         }
 
-        if (BCrypt.checkpw(password, user.getPassword())) {
+        String storedPasswordHash = user.getPassword();
+
+        if (storedPasswordHash == null || storedPasswordHash.isEmpty()) {
+            request.setAttribute("error", "Le mot de passe n'est pas défini. Veuillez contacter l'administrateur pour définir un mot de passe.");
+            request.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(request, response);
+            return;
+        }
+
+        if (BCrypt.checkpw(password, storedPasswordHash)) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            response.sendRedirect(Routes.LEARNER_LIST);
+            session.setAttribute("userRoles", user.getRoles());
+
+            if (hasRole(user, "LEARNER")) {
+                response.sendRedirect(Routes.CURRENT_LEARNER);
+            } else if (hasRole(user, "ADMIN")) {
+                response.sendRedirect(Routes.LEARNER_LIST);
+            } else {
+                response.sendRedirect(Routes.MESSAGE);
+            }
         } else {
             request.setAttribute("error", "Email ou mot de passe incorrect.");
             request.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(request, response);
@@ -61,6 +79,7 @@ public class LoginServlet extends HttpServlet {
 
         em.close();
     }
+
 
     @Override
     public void destroy() {

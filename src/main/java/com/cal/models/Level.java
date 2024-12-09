@@ -3,9 +3,13 @@ package com.cal.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "levels")
-public class Level {
+public class Level implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

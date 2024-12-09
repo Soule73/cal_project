@@ -9,6 +9,7 @@ import java.util.Date;
 @Table(name = "learner_subscription")
 @IdClass(LearnerSubscriptionId.class)
 public class LearnerSubscription implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id

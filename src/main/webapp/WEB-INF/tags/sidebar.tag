@@ -1,5 +1,11 @@
 <%@ tag %>
 <%@ tag import="com.cal.Routes" %>
+<%@ tag import="com.cal.models.User" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    boolean isAdmin = currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"));
+    boolean isLearner = currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("LEARNER"));
+%>
 <!-- ===== Sidebar Start ===== -->
 <aside
         :class="sidebarToggle ? 'translate-x-0' : '-translate-x-full'"
@@ -37,20 +43,24 @@
             class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
 
         <!-- Sidebar Menu -->
-        <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6" x-data="{ selected: $persist('Dashboard'), menuItems: [
-                { name: 'Apprenants', icon: 'apprenants-icon', route: '<%=Routes.LEARNER_LIST%>', key: 'listApprenants' },
-                { name: 'Langues', icon: 'langues-icon', route: '<%=Routes.LANG_LIST%>', key: 'listLanguages' },
-                { name: 'Salle', icon: 'salle-icon', route: '<%=Routes.ROOM_LIST%>', key: 'listRooms' },
-                { name: 'Abonnements', icon: 'abonnements-icon', route: '<%=Routes.SUBCRIPTION_LIST%>', key: 'listSubscriptions' },
-                { name: 'Messages', icon: 'message-icon', route: '<%=Routes.MESSAGE%>', key: 'message' },
-            ] }">
+        <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6" x-data="{
+                selected: $persist('Dashboard'),
+                menuItems: [
+                    { name: 'Apprenants', icon: 'apprenants-icon', route: '<%=Routes.LEARNER_LIST%>', key: 'listApprenants', show: <%= isAdmin %> },
+                    { name: 'Langues', icon: 'langues-icon', route: '<%=Routes.LANG_LIST%>', key: 'listLanguages', show: <%= isAdmin %> },
+                    { name: 'Salle', icon: 'salle-icon', route: '<%=Routes.ROOM_LIST%>', key: 'listRooms', show: <%= isAdmin %> },
+                    { name: 'Abonnements', icon: 'abonnements-icon', route: '<%=Routes.SUBCRIPTION_LIST%>', key: 'listSubscriptions', show: <%= isAdmin %> },
+                     { name: 'Mon profil', icon: 'mon-profil-icon', route: '<%=Routes.CURRENT_LEARNER%>', key: 'monProfil', show: <%= isLearner %> },
+                    { name: 'Messages', icon: 'message-icon', route: '<%=Routes.MESSAGE%>', key: 'message', show: true },
+                ]
+            }">
             <!-- Menu Group -->
             <div>
                 <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">MENU</h3>
 
                 <ul class="mb-6 flex flex-col gap-1.5">
                     <template x-for="item in menuItems" :key="item.key">
-                        <li>
+                        <li x-show="item.show">
                             <a :href="item.route"
                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                @click="selected = (selected === item.key ? '' : item.key)"
@@ -82,6 +92,11 @@
                                 <template x-if="item.icon === 'message-icon'">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path class="dark:stroke-white" stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                                    </svg>
+                                </template>
+                                <template x-if="item.icon === 'mon-profil-icon'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path class="dark:stroke-white" stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                                     </svg>
                                 </template>
 

@@ -3,11 +3,14 @@ package com.cal.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Table(name = "languages")
-public class Language {
+public class Language implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

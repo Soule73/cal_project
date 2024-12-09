@@ -2,15 +2,14 @@ package com.cal;
 
 public class Routes {
 
-    //    public static final String REGISTER = "/register";
+    // accées pulci
     public static final String LOGIN = "/login";
     public static final String LOGOUT = "/logout";
 
+    //accées admin
     public static final String LEARNER_LIST = "/learners";
     public static final String LEARNER_FORM = "/learner/form";
     public static final String LEARNER_SHOW = "/learners/show";
-    public static final String LEARN_SUBCRIPTIONS = "/learners/subcriptions";
-
 
     public static final String LANG_LIST = "/languages";
     public static final String LANG_FORM = "/language/form";
@@ -24,5 +23,16 @@ public class Routes {
 
     public static final String SUBCRIPTION_LIST = "/subcriptions";
     public static final String SUBCRIPTION_FORM = "/subcriptions/form";
+
+    //    accéess à l'appreant et admin
+    public static final String LEARN_SUBCRIPTIONS = "/learners/subcriptions";
+
+    //    accées à l'apprenant
+    public static final String CURRENT_LEARNER = "/learner";
+
+    //accées pour tous le monde si connecté
+    public static final String MESSAGE = "/message";
+    public static final String CHAT = "/chat";
+
 
 }

@@ -8,6 +8,7 @@ import java.util.Date;
 @Entity
 @Table(name = "messages")
 public class Message implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -18,7 +19,7 @@ public class Message implements Serializable {
     private String content;
 
     @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @ManyToOne
