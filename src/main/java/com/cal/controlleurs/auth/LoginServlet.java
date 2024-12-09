@@ -14,6 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+
 import java.io.IOException;
 
 import static com.cal.utils.Permission.hasRole;
@@ -65,13 +66,12 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             session.setAttribute("userRoles", user.getRoles());
 
-            if (hasRole(user, "LEARNER")) {
-                response.sendRedirect(Routes.CURRENT_LEARNER);
-            } else if (hasRole(user, "ADMIN")) {
+            if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
                 response.sendRedirect(Routes.LEARNER_LIST);
             } else {
-                response.sendRedirect(Routes.MESSAGE);
+                response.sendRedirect(Routes.CURRENT_LEARNER);
             }
+
         } else {
             request.setAttribute("error", "Email ou mot de passe incorrect.");
             request.getRequestDispatcher("WEB-INF/auth/login.jsp").forward(request, response);
