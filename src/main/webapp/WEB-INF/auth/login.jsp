@@ -31,8 +31,7 @@
             <div class="mx-auto max-w-screen-2xl p-2">
                 <!-- ====== Forms Section Start -->
                 <div
-                        class="rounded-sm  border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
-                >
+                        class="rounded-sm  border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                     <div class="flex flex-wrap items-center">
                         <div class="hidden w-full xl:block xl:w-1/2">
                             <div class="px-26 py-17.5 text-center">
@@ -45,11 +44,10 @@
                                 </p>
 
                                 <span class="mt-15 inline-block">
-                      <img
-                              height="200"
-                              src="${pageContext.request.contextPath}/src/svg/sign_up.svg"
-                              alt="Sign Up Svg"
-                      />
+			                      <img
+			                              height="200"
+			                              src="${pageContext.request.contextPath}/src/svg/sign_up.svg"
+			                              alt="Sign Up Svg"/>
                     </span>
                             </div>
                         </div>

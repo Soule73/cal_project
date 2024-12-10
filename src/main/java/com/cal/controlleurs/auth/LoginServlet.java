@@ -17,8 +17,6 @@ import jakarta.persistence.TypedQuery;
 
 import java.io.IOException;
 
-import static com.cal.utils.Permission.hasRole;
-
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -67,9 +65,9 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userRoles", user.getRoles());
 
             if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
-                response.sendRedirect(Routes.LEARNER_LIST);
+                response.sendRedirect(request.getContextPath() + Routes.LEARNER_LIST);
             } else {
-                response.sendRedirect(Routes.CURRENT_LEARNER);
+                response.sendRedirect(request.getContextPath() + Routes.CURRENT_LEARNER);
             }
 
         } else {
@@ -80,10 +78,9 @@ public class LoginServlet extends HttpServlet {
         em.close();
     }
 
-
     @Override
     public void destroy() {
-        if (emf != null) {
+        if (emf.isOpen()) {
             emf.close();
         }
     }

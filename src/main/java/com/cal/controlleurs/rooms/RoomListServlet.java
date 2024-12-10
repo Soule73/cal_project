@@ -70,7 +70,6 @@ public class RoomListServlet extends HttpServlet {
 
             List<Room> rooms = query.getResultList();
 
-            // Compter le nombre total de salles pour la pagination
             TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(r) FROM Room r", Long.class);
             if (!searchQuery.isEmpty()) {
                 countQuery = em.createQuery("SELECT COUNT(r) FROM Room r WHERE r.name LIKE :searchQuery", Long.class);

@@ -186,7 +186,7 @@
                 if (this.isFetching) return;
                 this.isFetching = true;
 
-                const url = '<%=Routes.LEARNER_LIST%>';
+                const url = '${pageContext.request.contextPath}<%=Routes.LEARNER_LIST%>';
                 const data = {
                     page: this.page,
                     pageSize: this.pageSize,

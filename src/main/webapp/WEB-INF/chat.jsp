@@ -142,7 +142,8 @@
                             firstName: messageData.firstName,
                             lastName: messageData.lastName,
                             content: messageData.content,
-                            timestamp: messageDate.toTimeString().split(' ')[0], // Affiche l'heure, minute, seconde
+                            // Affiche l'heure, minute, seconde
+                            timestamp: messageDate.toTimeString().split(' ')[0],
                             date: messageDate.toLocaleDateString(),
                             isCurrentUser: messageData.learnerId === this.learnerId
                         });
@@ -159,15 +160,17 @@
                     const messageContent = this.newMessage;
                     const messageDate = new Date();
 
-                    // Ajouter immédiatement le message au chat
-                    const tempId = Date.now();  // Utilisation d'un ID temporaire
+                    // Utilisation d'un ID temporaire
+                    const tempId = Date.now();
+
                     this.messages.push({
                         id: tempId,
                         learnerId: this.learnerId,
                         firstName: this.firstName,
                         lastName: this.lastName,
                         content: messageContent,
-                        timestamp: messageDate.toTimeString().split(' ')[0], // Affiche l'heure, minute, seconde
+                        // Affiche l'heure, minute, seconde
+                        timestamp: messageDate.toTimeString().split(' ')[0],
                         date: messageDate.toLocaleDateString(),
                         isCurrentUser: true
                     });
@@ -184,7 +187,6 @@
                     this.ws.send(message);
                     this.newMessage = '';
 
-                    // Défilement automatique vers le bas
                     this.$nextTick(() => {
                         this.scrollToBottom();
                     });

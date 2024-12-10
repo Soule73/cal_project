@@ -45,7 +45,7 @@ public class AuthFilter implements Filter {
         HttpSession session = httpRequest.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
-            httpResponse.sendRedirect(Routes.LOGIN);
+            httpResponse.sendRedirect(httpRequest.getContextPath()+Routes.LOGIN);
             return;
         }
 

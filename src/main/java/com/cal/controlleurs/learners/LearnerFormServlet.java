@@ -16,13 +16,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @WebServlet(Routes.LEARNER_FORM)
 public class LearnerFormServlet extends HttpServlet {
@@ -36,79 +36,45 @@ public class LearnerFormServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
-        if (jsonObject == null) return;
-
-        Map<String, String> errors = new HashMap<>();
-        User learner = new User();
-        try {
-            checkInputValue(jsonObject, learner);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("global", "Données JSON invalides");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
-        if (ValidationUtils.validateLearner(response, errors, learner)) return;
-
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-
-            // Persister l'apprenant
-            em.persist(learner);
-            em.flush(); // Assurez-vous que l'apprenant a un ID assigné
-
-            // Assigner le rôle LEARNER en créant un objet UserRole
-            Role learnerRole = em.createQuery("SELECT r FROM Role r WHERE r.name = 'LEARNER'", Role.class).getSingleResult();
-            UserRole userRole = new UserRole();
-            userRole.setId(new UserRoleId(learner.getId(), learnerRole.getId()));
-            userRole.setUser(learner);
-            userRole.setRole(learnerRole);
-            em.persist(userRole);
-
-            transaction.commit();
-            em.refresh(learner);
-
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write(new JSONObject(Map.of("message", "L'apprenant a été ajouté avec succès!", "learnerId", learner.getId())).toString());
-        } catch (Exception e) {
-            handleException(response, errors, em , e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
+        processRequest(request, response, HttpMethod.POST);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        processRequest(request, response, HttpMethod.PUT);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        processRequest(request, response, HttpMethod.DELETE);
+    }
+
+    private void processRequest(HttpServletRequest request, HttpServletResponse response, HttpMethod method) throws IOException {
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
         if (jsonObject == null) return;
 
         Map<String, String> errors = new HashMap<>();
-        long learnerId = jsonObject.optLong("id", 0);
-        if (learnerId == 0) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID de l'apprenant manquant");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         try {
+            User learner = null;
+            if (method != HttpMethod.POST) {
+                learner = findLearner(jsonObject, response, errors, em);
+                if (learner == null) return; // Response already handled in findLearner
+            }
+
             transaction.begin();
-            User learner = em.find(User.class, learnerId);
-            if (learner == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Apprenant non trouvé");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            if (method == HttpMethod.DELETE) {
+                em.remove(learner);
+                transaction.commit();
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(new JSONObject(Map.of("message", "L'apprenant a été supprimé avec succès!")).toString());
                 return;
+            }
+
+            if (method == HttpMethod.POST) {
+                learner = new User();
             }
 
             try {
@@ -122,13 +88,31 @@ public class LearnerFormServlet extends HttpServlet {
 
             if (ValidationUtils.validateLearner(response, errors, learner)) return;
 
-            em.merge(learner);
-            transaction.commit();
+            if (jsonObject.has("password") && !jsonObject.getString("password").isEmpty()) {
+                String hashedPassword = BCrypt.hashpw(jsonObject.getString("password"), BCrypt.gensalt());
+                learner.setPassword(hashedPassword);
+            }
 
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Les informations ont été mises à jour avec succès!")).toString());
+            if (method == HttpMethod.POST) {
+                em.persist(learner);
+                em.flush();
+                assignRoleToLearner(em, learner);
+            } else {
+                em.merge(learner);
+            }
+
+            transaction.commit();
+            em.refresh(learner);
+
+            if (method == HttpMethod.POST) {
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                response.getWriter().write(new JSONObject(Map.of("message", "L'apprenant a été ajouté avec succès!", "learnerId", learner.getId())).toString());
+            } else {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(new JSONObject(Map.of("message", "Les informations ont été mises à jour avec succès!")).toString());
+            }
         } catch (Exception e) {
-            handleException(response, errors, em , e);
+            handleException(response, errors, em, e);
         } finally {
             if (em.isOpen()) {
                 em.close();
@@ -136,45 +120,33 @@ public class LearnerFormServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
-        if (jsonObject == null) return;
-
-        Map<String, String> errors = new HashMap<>();
+    private User findLearner(JSONObject jsonObject, HttpServletResponse response, Map<String, String> errors, EntityManager em) throws IOException {
         long learnerId = jsonObject.optLong("id", 0);
         if (learnerId == 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             errors.put("id", "ID de l'apprenant manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
+            return null;
         }
 
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-            User learner = em.find(User.class, learnerId);
-            if (learner == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Apprenant non trouvé");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
-
-            em.remove(learner);
-            transaction.commit();
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "L'apprenant a été supprimé avec succès!")).toString());
-        } catch (Exception e) {
-            handleException(response, errors, em , e);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
+        User learner = em.find(User.class, learnerId);
+        if (learner == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            errors.put("global", "Apprenant non trouvé");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return null;
         }
+
+        return learner;
+    }
+
+    private void assignRoleToLearner(EntityManager em, User learner) {
+        Role learnerRole = em.createQuery("SELECT r FROM Role r WHERE r.name = 'LEARNER'", Role.class).getSingleResult();
+        UserRole userRole = new UserRole();
+        userRole.setId(new UserRoleId(learner.getId(), learnerRole.getId()));
+        userRole.setUser(learner);
+        userRole.setRole(learnerRole);
+        em.persist(userRole);
     }
 
     private void checkInputValue(JSONObject jsonObject, User learner) {
@@ -204,5 +176,9 @@ public class LearnerFormServlet extends HttpServlet {
         }
 
         response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+    }
+
+    private enum HttpMethod {
+        POST, PUT, DELETE
     }
 }

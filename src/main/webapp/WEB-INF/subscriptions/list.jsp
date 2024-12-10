@@ -193,7 +193,7 @@
                 if (this.isFetching) return;
                 this.isFetching = true;
 
-                const url = '<%=Routes.SUBCRIPTION_LIST%>';
+                const url = '${pageContext.request.contextPath}<%=Routes.SUBCRIPTION_LIST%>';
                 const data = {
                     page: this.page,
                     pageSize: this.pageSize,

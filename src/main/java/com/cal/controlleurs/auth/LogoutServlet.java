@@ -19,6 +19,6 @@ public class LogoutServlet extends HttpServlet {
         if (session != null) {
             session.invalidate();
         }
-        resp.sendRedirect(Routes.LOGIN);
+        resp.sendRedirect(req.getContextPath() + Routes.LOGIN);
     }
 }

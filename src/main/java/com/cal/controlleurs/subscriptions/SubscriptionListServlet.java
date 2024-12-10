@@ -70,7 +70,6 @@ public class SubscriptionListServlet extends HttpServlet {
 
             List<Subscription> subscriptions = query.getResultList();
 
-            // Compter le nombre total d'abonnements pour la pagination
             TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(s) FROM Subscription s", Long.class);
             if (!searchQuery.isEmpty()) {
                 countQuery = em.createQuery("SELECT COUNT(s) FROM Subscription s WHERE s.name LIKE :searchQuery OR s.description LIKE :searchQuery", Long.class);

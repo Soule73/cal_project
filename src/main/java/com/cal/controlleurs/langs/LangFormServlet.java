@@ -36,69 +36,45 @@ public class LangFormServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
-        if (jsonObject == null) return;
-
-        Map<String, String> errors = new HashMap<>();
-        Language language = new Language();
-
-        try {
-            setLanguageFields(jsonObject, language);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("global", "Données JSON invalides");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
-        if (validateLanguageForm(response, errors, language)) return;
-
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-            em.persist(language);
-            transaction.commit();
-
-            em.refresh(language);
-
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            response.getWriter().write(new JSONObject(Map.of("message", "La langue a été ajoutée avec succès!", "languageId", language.getId())).toString());
-        } catch (Exception e) {
-            handleException(e, transaction, response, errors);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
-        }
+        processRequest(request, response, HttpMethod.POST);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        processRequest(request, response, HttpMethod.PUT);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        processRequest(request, response, HttpMethod.DELETE);
+    }
+
+    private void processRequest(HttpServletRequest request, HttpServletResponse response, HttpMethod method) throws IOException {
         JSONObject jsonObject = JsonData.parseRequestBody(request, response);
         if (jsonObject == null) return;
 
         Map<String, String> errors = new HashMap<>();
-        long languageId = jsonObject.optLong("id", 0);
-        if (languageId == 0) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            errors.put("id", "ID de la langue manquant");
-            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
-        }
-
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
 
         try {
+            Language language = null;
+            if (method != HttpMethod.POST) {
+                language = findLanguage(jsonObject, response, errors, em);
+                if (language == null) return; // Response already handled in findLanguage
+            }
+
             transaction.begin();
-            Language language = em.find(Language.class, languageId);
-            if (language == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Langue non trouvée");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            if (method == HttpMethod.DELETE) {
+                em.remove(language);
+                transaction.commit();
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(new JSONObject(Map.of("message", "La langue a été supprimée avec succès!")).toString());
                 return;
+            }
+
+            if (method == HttpMethod.POST) {
+                language = new Language();
             }
 
             try {
@@ -112,13 +88,24 @@ public class LangFormServlet extends HttpServlet {
 
             if (validateLanguageForm(response, errors, language)) return;
 
-            em.merge(language);
-            transaction.commit();
+            if (method == HttpMethod.POST) {
+                em.persist(language);
+            } else {
+                em.merge(language);
+            }
 
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "Les informations de la langue ont été mises à jour avec succès!")).toString());
+            transaction.commit();
+            em.refresh(language);
+
+            if (method == HttpMethod.POST) {
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                response.getWriter().write(new JSONObject(Map.of("message", "La langue a été ajoutée avec succès!", "languageId", language.getId())).toString());
+            } else {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(new JSONObject(Map.of("message", "Les informations de la langue ont été mises à jour avec succès!")).toString());
+            }
         } catch (Exception e) {
-            handleException(e, transaction, response, errors);
+            handleException((Exception) response, (EntityManager) errors, (HttpServletResponse) em, (Map<String, String>) e);
         } finally {
             if (em.isOpen()) {
                 em.close();
@@ -126,45 +113,24 @@ public class LangFormServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = JsonData.parseRequestBody(request, response);
-        if (jsonObject == null) return;
-
-        Map<String, String> errors = new HashMap<>();
+    private Language findLanguage(JSONObject jsonObject, HttpServletResponse response, Map<String, String> errors, EntityManager em) throws IOException {
         long languageId = jsonObject.optLong("id", 0);
         if (languageId == 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             errors.put("id", "ID de la langue manquant");
             response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-            return;
+            return null;
         }
 
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-            Language language = em.find(Language.class, languageId);
-            if (language == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errors.put("global", "Langue non trouvée");
-                response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
-                return;
-            }
-
-            em.remove(language);
-            transaction.commit();
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(new JSONObject(Map.of("message", "La langue a été supprimée avec succès!")).toString());
-        } catch (Exception e) {
-            handleException(e, transaction, response, errors);
-        } finally {
-            if (em.isOpen()) {
-                em.close();
-            }
+        Language language = em.find(Language.class, languageId);
+        if (language == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            errors.put("global", "Langue non trouvée");
+            response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+            return null;
         }
+
+        return language;
     }
 
     private boolean validateLanguageForm(HttpServletResponse response, Map<String, String> errors, Language language) throws IOException {
@@ -187,14 +153,16 @@ public class LangFormServlet extends HttpServlet {
         language.setName(jsonObject.getString("name"));
     }
 
-    private void handleException(Exception e, EntityTransaction transaction, HttpServletResponse response, Map<String, String> errors) throws IOException {
-        if (transaction.isActive()) {
-            transaction.rollback();
+    private void handleException(Exception e, EntityManager em, HttpServletResponse response, Map<String, String> errors) throws IOException {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
         }
+
         Throwable cause = e.getCause();
         while (cause != null && !(cause instanceof SQLIntegrityConstraintViolationException)) {
             cause = cause.getCause();
         }
+
         if (cause != null) {
             errors.put("name", "Le nom de la langue est déjà utilisé");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -202,6 +170,11 @@ public class LangFormServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             errors.put("global", "Une erreur s'est produite lors de l'opération");
         }
+
         response.getWriter().write(new JSONObject(Map.of("errors", errors)).toString());
+    }
+
+    private enum HttpMethod {
+        POST, PUT, DELETE
     }
 }

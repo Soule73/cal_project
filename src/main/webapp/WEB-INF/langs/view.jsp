@@ -197,7 +197,7 @@
                 if (this.isFetching) return;
                 this.isFetching = true;
 
-                const url = '${Routes.LANG_COURSE}';
+                const url = '${pageContext.request.contextPath}${Routes.LANG_COURSE}';
                 const data = {
                     languageId: '${language.id}',
                     page: this.page,

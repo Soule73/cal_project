@@ -2,7 +2,7 @@ package com.cal;
 
 public class Routes {
 
-    // accées pulci
+    // Accées public
     public static final String LOGIN = "/login";
     public static final String LOGOUT = "/logout";
 
@@ -24,13 +24,13 @@ public class Routes {
     public static final String SUBCRIPTION_LIST = "/subcriptions";
     public static final String SUBCRIPTION_FORM = "/subcriptions/form";
 
-    //    accéess à l'appreant et admin
+    //Accéess à l'appreant et admin
     public static final String LEARN_SUBCRIPTIONS = "/learners/subcriptions";
 
-    //    accées à l'apprenant
+    //Accées à l'apprenant
     public static final String CURRENT_LEARNER = "/learner";
 
-    //accées pour tous le monde si connecté
+    //Accées pour tous le monde si connecté
     public static final String MESSAGE = "/message";
     public static final String CHAT = "/chat";
 

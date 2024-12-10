@@ -67,7 +67,6 @@ public class LearnerSubscriptionServlet extends HttpServlet {
             json.put("name", learnerSubscription.getSubscription().getName());
             json.put("description", learnerSubscription.getSubscription().getDescription());
 
-            // Récupérer les cours correspondant à la langue et au niveau de l'apprenant
             String coursesJpql = "SELECT c FROM Course c " +
                     "WHERE c.subscription.id = :subscriptionId " +
                     "AND c.language.id = :languageId " +

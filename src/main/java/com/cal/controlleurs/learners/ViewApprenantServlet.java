@@ -41,7 +41,6 @@ public class ViewApprenantServlet extends HttpServlet {
 
             String path = request.getServletPath();
 
-            // Vérification de la route et récupération de l'ID
             if (Routes.CURRENT_LEARNER.equals(path)) {
                 id = currentUser.getId();
             } else if (Routes.LEARNER_SHOW.equals(path)) {
@@ -57,7 +56,6 @@ public class ViewApprenantServlet extends HttpServlet {
                 return;
             }
 
-            // Récupérer les informations de l'apprenant à partir de la base de données
             User learner = em.find(User.class, id);
             if (learner == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Apprenant non trouvé.");

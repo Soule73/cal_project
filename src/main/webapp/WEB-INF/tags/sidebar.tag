@@ -61,7 +61,7 @@
                 <ul class="mb-6 flex flex-col gap-1.5">
                     <template x-for="item in menuItems" :key="item.key">
                         <li x-show="item.show">
-                            <a :href="item.route"
+                            <a :href="${pageContext.request.contextPath}item.route"
                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                @click="selected = (selected === item.key ? '' : item.key)"
                                :class="{ 'bg-graydark dark:bg-meta-4': (selected === item.key) && (page === item.key), 'bg-graydark': page === item.key }">
