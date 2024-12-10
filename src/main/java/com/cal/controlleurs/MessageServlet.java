@@ -13,6 +13,7 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setAttribute("sockerPort",this.getServletContext().getInitParameter("SOCKET_PORT"));
         req.getRequestDispatcher("WEB-INF/chat.jsp").forward(req, resp);
     }
 }

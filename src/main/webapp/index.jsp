@@ -29,7 +29,7 @@
                 Centre d'appretissage linguistique
             </p>
             <div  class="w-full md:flex items-center justify-center lg:justify-start md:space-x-5">
-                <a href="<%=Routes.LOGIN%>" class="lg:mx-0 bg-primary text-white text-xl font-bold rounded-full py-4 px-9 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out">
+                <a href="${pageContext.request.contextPath}<%=Routes.LOGIN%>" class="lg:mx-0 bg-primary text-white text-xl font-bold rounded-full py-4 px-9 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out">
                     Se connecter
                 </a>
             </div>

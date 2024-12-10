@@ -130,7 +130,7 @@
             firstName: '<%=user.getFirstname()%>',
             lastName: '<%=user.getLastname()%>',
             init() {
-                this.ws = new WebSocket("ws://localhost:8011/<%=Routes.CHAT%>");
+                this.ws = new WebSocket("ws://localhost:${sockerPort}/<%=Routes.CHAT%>");
 
                 this.ws.onmessage = (event) => {
                     const messageData = JSON.parse(event.data);
