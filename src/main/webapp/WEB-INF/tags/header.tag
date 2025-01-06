@@ -113,7 +113,7 @@
                         %>
                             <span
                                     class="block text-sm font-medium text-black dark:text-white">
-                               Bonjour, <%= user.getLastname() %>!</span>
+                               Bonjour, <%= user.getFullname() %>!</span>
 
                         <%
                             }

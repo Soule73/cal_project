@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import jakarta.servlet.FilterConfig;
-
 @WebFilter(urlPatterns = {
         Routes.LEARNER_LIST,
         Routes.LEARNER_SHOW,

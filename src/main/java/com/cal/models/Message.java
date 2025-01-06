@@ -24,7 +24,11 @@ public class Message implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User learner;
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
 
     // Getters and Setters
 
@@ -52,11 +56,19 @@ public class Message implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public User getLearner() {
-        return learner;
+    public User getUser() {
+        return user;
     }
 
-    public void setLearner(User learner) {
-        this.learner = learner;
+    public void setUser(User learner) {
+        this.user = learner;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
     }
 }

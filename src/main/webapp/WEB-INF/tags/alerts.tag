@@ -1,4 +1,4 @@
-<%@ tag pageEncoding="UTF-8"%>
+<%@ tag pageEncoding="UTF-8" %>
 
 <%
     HttpSession sessionMsg = request.getSession();
@@ -45,8 +45,7 @@
 <% } else if ("error".equals(flashType)) { %>
 <!-- Alerts Erreur Item -->
 <div id="errorMessage"
-     class="flex w-full mb-4 border-l-6 border-[#F87171] bg-[#F87171] bg-opacity-[15%] px-7 py-8 shadow-md dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9"
->
+     class="flex w-full mb-4 border-l-6 border-[#F87171] bg-[#F87171] bg-opacity-[15%] px-7 py-8 shadow-md dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9">
     <div
             class="mr-5 flex h-9 w-full max-w-[36px] items-center justify-center rounded-lg bg-[#F87171]"
     >

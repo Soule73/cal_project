@@ -18,9 +18,11 @@
         <class>com.cal.models.Role</class>
         <class>com.cal.models.UserRole</class>
         <class>com.cal.models.LearnerSubscription</class>
+        <class>com.cal.models.Conversation</class>
+        <class>com.cal.models.ConversationMember</class>
 
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/cal_db"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/cal"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

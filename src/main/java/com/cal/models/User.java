@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.io.Serializable;
 
@@ -63,6 +64,13 @@ public class User implements Serializable {
     )
     private Set<Role> roles;
 
+
+    @OneToMany(mappedBy = "user")
+    private Set<Message> messages = new HashSet<>();
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Conversation> conversations = new HashSet<>();
+
     // Getters and Setters
 
     public Long getId() {
@@ -91,8 +99,12 @@ public class User implements Serializable {
 
     public String getEmail() {
         return email;
-    }    public String getFullname() {
-        return firstname+" "+lastname;
+    }
+    public String getFullname() {
+      String  fullName="";
+      fullName+=firstname != null ? firstname+" " : "";
+      fullName+=lastname != null ? lastname : "";
+        return fullName.isEmpty() ? "Inconnue" : fullName;
     }
 
     public void setEmail(String email) {
@@ -145,5 +157,21 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }
+
+    public Set<Conversation> getConversations() {
+        return conversations;
+    }
+
+    public void setConversations(Set<Conversation> conversations) {
+        this.conversations = conversations;
     }
 }

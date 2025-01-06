@@ -8,7 +8,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="22">
+          <list size="23">
             <item index="0" class="java.lang.String" itemvalue=":class" />
             <item index="1" class="java.lang.String" itemvalue="@click.outside" />
             <item index="2" class="java.lang.String" itemvalue="x-data" />
@@ -31,6 +31,7 @@
             <item index="19" class="java.lang.String" itemvalue=":href" />
             <item index="20" class="java.lang.String" itemvalue=":src" />
             <item index="21" class="java.lang.String" itemvalue="@keyup.enter" />
+            <item index="22" class="java.lang.String" itemvalue="x-if" />
           </list>
         </value>
       </option>
