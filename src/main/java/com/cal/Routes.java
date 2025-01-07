@@ -30,7 +30,7 @@ public class Routes {
     //Accées à l'apprenant
     public static final String CURRENT_LEARNER = "/learner";
 
-    //Accées pour tous le monde si connecté
+    //Accées pour tout le monde si connecté
     public static final String MESSAGE = "/message";
     public static final String CHAT = "/chat";
 

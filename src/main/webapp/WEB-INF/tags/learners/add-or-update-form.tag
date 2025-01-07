@@ -139,7 +139,7 @@
                 console.log("Sending data:", data);
                 const method = this.form.id ? 'PUT' : 'POST';
 
-                fetch('<%=Routes.LEARNER_FORM%>', {
+                fetch('${pageContext.request.contextPath}<%=Routes.LEARNER_FORM%>', {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json',
