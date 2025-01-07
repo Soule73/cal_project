@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@WebServlet("/user-search")
-public class UserSearchServlet extends HttpServlet {
+@WebServlet("/group-user-search")
+public class GroupUserSearchServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
 
@@ -97,3 +97,4 @@ public class UserSearchServlet extends HttpServlet {
         }
     }
 }
+

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : lun. 09 déc. 2024 à 12:43
+-- Généré le : mar. 07 jan. 2025 à 08:11
 -- Version du serveur : 8.0.30
 -- Version de PHP : 8.3.6
 
@@ -18,8 +18,52 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `cal_db`
+-- Base de données : `cal`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `conversations`
+--
+
+CREATE TABLE `conversations` (
+                                 `id` bigint NOT NULL,
+                                 `name` varchar(255) DEFAULT NULL,
+                                 `is_group` tinyint(1) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `conversations`
+--
+
+INSERT INTO `conversations` (`id`, `name`, `is_group`) VALUES
+                                                           (1, NULL, 0),
+                                                           (14, 'Génerale', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `conversation_members`
+--
+
+CREATE TABLE `conversation_members` (
+                                        `user_id` int NOT NULL,
+                                        `conversation_id` bigint NOT NULL,
+                                        `is_admin` tinyint(1) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `conversation_members`
+--
+
+INSERT INTO `conversation_members` (`user_id`, `conversation_id`, `is_admin`) VALUES
+                                                                                  (1, 1, 0),
+                                                                                  (1, 14, 0),
+                                                                                  (2, 1, 0),
+                                                                                  (2, 14, 0),
+                                                                                  (3, 14, 0),
+                                                                                  (4, 14, 1);
 
 -- --------------------------------------------------------
 
@@ -127,24 +171,27 @@ CREATE TABLE `messages` (
                             `id` int NOT NULL,
                             `content` text NOT NULL,
                             `created_at` timestamp NOT NULL,
-                            `user_id` int NOT NULL
+                            `user_id` int NOT NULL,
+                            `conversation_id` bigint DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `messages`
 --
 
-INSERT INTO `messages` (`id`, `content`, `created_at`, `user_id`) VALUES
-                                                                      (1, 'Looking for a conversation partner for French.', '2024-04-01 08:00:00', 1),
-                                                                      (2, 'Anyone interested in a Spanish study group?', '2024-04-02 08:01:00', 2),
-                                                                      (3, 'Tips for improving English pronunciation?', '2024-04-03 08:02:00', 3),
-                                                                      (16, 'test', '2024-12-08 09:04:00', 4),
-                                                                      (17, 'dfghlml', '2024-12-08 09:05:00', 4),
-                                                                      (18, 'sdfghj', '2024-12-08 09:06:00', 4),
-                                                                      (19, 'Hello', '2024-12-08 09:09:00', 1),
-                                                                      (20, 'test', '2024-12-08 09:10:00', 1),
-                                                                      (21, 'sdfgh', '2024-12-08 21:49:57', 4),
-                                                                      (22, 'sdfghklm', '2024-12-08 21:50:36', 1);
+INSERT INTO `messages` (`id`, `content`, `created_at`, `user_id`, `conversation_id`) VALUES
+                                                                                         (1, 'Looking for a conversation partner for French.', '2024-04-01 08:00:00', 1, NULL),
+                                                                                         (2, 'Anyone interested in a Spanish study group?', '2024-04-02 08:01:00', 2, NULL),
+                                                                                         (3, 'Tips for improving English pronunciation?', '2024-04-03 08:02:00', 3, NULL),
+                                                                                         (16, 'test', '2024-12-08 09:04:00', 4, NULL),
+                                                                                         (17, 'dfghlml', '2024-12-08 09:05:00', 4, NULL),
+                                                                                         (18, 'sdfghj', '2024-12-08 09:06:00', 4, NULL),
+                                                                                         (19, 'Hello', '2024-12-08 09:09:00', 1, NULL),
+                                                                                         (20, 'test', '2024-12-08 09:10:00', 1, NULL),
+                                                                                         (21, 'sdfgh', '2024-12-08 21:49:57', 4, NULL),
+                                                                                         (22, 'sdfghklm', '2024-12-08 21:50:36', 1, NULL),
+                                                                                         (23, 'Bonjour', '2025-01-06 14:18:57', 2, 1),
+                                                                                         (24, 'Salut !', '2025-01-06 14:19:16', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -285,6 +332,19 @@ INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 --
 
 --
+-- Index pour la table `conversations`
+--
+ALTER TABLE `conversations`
+    ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `conversation_members`
+--
+ALTER TABLE `conversation_members`
+    ADD PRIMARY KEY (`user_id`,`conversation_id`),
+    ADD KEY `conversation_members_ibfk_2` (`conversation_id`);
+
+--
 -- Index pour la table `courses`
 --
 ALTER TABLE `courses`
@@ -324,7 +384,8 @@ ALTER TABLE `levels`
 --
 ALTER TABLE `messages`
     ADD PRIMARY KEY (`id`),
-    ADD KEY `idx_messages_learner_id` (`user_id`);
+    ADD KEY `idx_messages_learner_id` (`user_id`),
+    ADD KEY `fk_conversation` (`conversation_id`);
 
 --
 -- Index pour la table `roles`
@@ -377,6 +438,12 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT pour la table `conversations`
+--
+ALTER TABLE `conversations`
+    MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
@@ -398,7 +465,7 @@ ALTER TABLE `levels`
 -- AUTO_INCREMENT pour la table `messages`
 --
 ALTER TABLE `messages`
-    MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+    MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT pour la table `roles`
@@ -429,6 +496,13 @@ ALTER TABLE `users`
 --
 
 --
+-- Contraintes pour la table `conversation_members`
+--
+ALTER TABLE `conversation_members`
+    ADD CONSTRAINT `conversation_members_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    ADD CONSTRAINT `conversation_members_ibfk_2` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+--
 -- Contraintes pour la table `courses`
 --
 ALTER TABLE `courses`
@@ -448,7 +522,8 @@ ALTER TABLE `learner_subscription`
 -- Contraintes pour la table `messages`
 --
 ALTER TABLE `messages`
-    ADD CONSTRAINT `fk_messages_learner_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `fk_conversation` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    ADD CONSTRAINT `fk_messages_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `users`

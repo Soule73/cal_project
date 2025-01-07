@@ -29,7 +29,12 @@
                     </div>
                     <div class="w-full">
                         <h5 class="text-sm font-medium text-black dark:text-white"
-                            x-text="conversation.name"></h5>
+                            >
+                            <span x-text="conversation.name"></span>
+                            <button x-show="conversation.isGroup" class="inline-flex rounded-full border border-primary px-1 ml-1 text-xs font-medium text-primary hover:opacity-80">
+                              Group
+                            </button>
+                        </h5>
                         <p class="text-sm font-medium"
                            x-text="conversation.messages.length > 0 ? conversation.messages[conversation.messages.length - 1].content : 'Pas de messages'">
                         </p>

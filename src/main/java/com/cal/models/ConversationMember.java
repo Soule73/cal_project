@@ -8,8 +8,10 @@ import jakarta.validation.constraints.NotNull;
 @IdClass(ConversationMemberId.class)
 public class ConversationMember {
     @Id
+    @Column(name = "user_id")
     private Long userId;
     @Id
+    @Column(name = "conversation_id")
     private Long conversationId;
 
     @Column(name = "is_admin")

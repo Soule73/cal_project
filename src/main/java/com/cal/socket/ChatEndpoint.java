@@ -2,9 +2,7 @@ package com.cal.socket;
 
 import com.cal.Routes;
 import com.cal.middlewares.HttpSessionConfigurator;
-import com.cal.models.Conversation;
-import com.cal.models.Message;
-import com.cal.models.User;
+import com.cal.models.*;
 import jakarta.persistence.Persistence;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
@@ -15,6 +13,7 @@ import org.json.JSONObject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -71,6 +70,15 @@ public class ChatEndpoint {
 
             // Envoyer la nouvelle conversation aux membres concernés
             sendConversationToMembers(conversation, session);
+        } else if ("createGroup".equals(messageType)) {
+            String groupName = jsonMessage.getString("groupName");
+            JSONArray memberIds = jsonMessage.getJSONArray("memberIds");
+
+            // Créer un nouveau groupe
+            Conversation group = createGroup(currentUser, groupName, memberIds);
+
+            // Envoyer la nouvelle conversation aux membres concernés
+            sendConversationToMembers(group, session);
         } else if ("sendMessage".equals(messageType)) {
             Long userId = jsonMessage.getLong("userId");
             Long conversationId = jsonMessage.getLong("conversationId");
@@ -95,7 +103,115 @@ public class ChatEndpoint {
             // Envoyer le message seulement aux membres de la conversation concernée
             Conversation conversation = em.find(Conversation.class, conversationId);
             sendToMembers(conversation, broadcastMessage, session);
+        } else if ("addMember".equals(messageType)) {
+            Long conversationId = jsonMessage.getLong("conversationId");
+            Long newMemberId = jsonMessage.getLong("newMemberId");
+
+            addMemberToGroup(conversationId, newMemberId);
+        } else if ("removeMember".equals(messageType)) {
+            Long conversationId = jsonMessage.getLong("conversationId");
+            Long memberId = jsonMessage.getLong("memberId");
+
+            removeMemberFromGroup(conversationId, memberId);
         }
+    }
+
+    private void addMemberToGroup(Long conversationId, Long newMemberId) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            Conversation conversation = em.find(Conversation.class, conversationId);
+            User newMember = em.find(User.class, newMemberId);
+
+            conversation.getMembers().add(newMember);
+            em.merge(conversation);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
+
+    private void removeMemberFromGroup(Long conversationId, Long memberId) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+            Conversation conversation = em.find(Conversation.class, conversationId);
+            User member = em.find(User.class, memberId);
+
+            conversation.getMembers().remove(member);
+            em.merge(conversation);
+            transaction.commit();
+
+            // Notifier tous les membres de la suppression du membre
+            JSONObject notification = new JSONObject();
+            notification.put("type", "removeMember");
+            notification.put("conversationId", conversationId);
+            notification.put("memberId", memberId);
+
+            sendToMembers(conversation, notification, null);
+
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
+
+    private Conversation createGroup(User creator, String groupName, JSONArray memberIds) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        Conversation group = new Conversation();
+
+        try {
+            transaction.begin();
+
+            group.setName(groupName);
+            group.setGroup(true);
+            group.getMembers().add(creator);
+
+            for (int i = 0; i < memberIds.length(); i++) {
+                Long memberId = memberIds.getLong(i);
+                User member = em.find(User.class, memberId);
+                group.getMembers().add(member);
+            }
+
+            em.persist(group);
+            em.flush();
+
+            // Mettre à jour le créateur comme admin
+            ConversationMemberId creatorMemberId = new ConversationMemberId();
+            creatorMemberId.setUserId(creator.getId());
+            creatorMemberId.setConversationId(group.getId());
+
+            ConversationMember creatorMember = em.find(ConversationMember.class, creatorMemberId);
+            if (creatorMember != null) {
+                creatorMember.setAdmin(true);
+                em.merge(creatorMember);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+
+        return group;
     }
 
     private void sendConversationToMembers(Conversation conversation, Session currentSession) throws IOException {
@@ -107,7 +223,7 @@ public class ChatEndpoint {
                 response.put("type", "startConversation");
                 response.put("conversation", new JSONObject()
                         .put("id", conversation.getId())
-                        .put("name", getPrivateConversationName(conversation, member))  // Correctement définir le nom pour chaque membre
+                        .put("name", conversation.isGroup() ? conversation.getName() : getPrivateConversationName(conversation, member))  // Correctement définir le nom pour chaque membre
                         .put("isGroup", conversation.isGroup()));
 
                 peer.getBasicRemote().sendText(response.toString());
@@ -186,8 +302,18 @@ public class ChatEndpoint {
                     }
                     JSONObject jsonMember = new JSONObject();
                     jsonMember.put("id", member.getId());
-                    jsonMember.put("firstname", member.getFirstname());
-                    jsonMember.put("lastname", member.getLastname());
+                    jsonMember.put("email", member.getEmail());
+
+                    jsonMember.put("fullName", member.getFullname());
+
+                    // Récupérer le statut is_admin pour chaque membre
+                    ConversationMemberId memberId = new ConversationMemberId();
+                    memberId.setUserId(member.getId());
+                    memberId.setConversationId(conversation.getId());
+                    ConversationMember conversationMember = em.find(ConversationMember.class, memberId);
+                    jsonMember.put("is_admin", conversationMember != null && conversationMember.isAdmin());
+
+
                     membersArray.put(jsonMember);
                 }
                 jsonConversation.put("members", membersArray);

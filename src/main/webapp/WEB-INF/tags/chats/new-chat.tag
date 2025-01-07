@@ -1,5 +1,10 @@
 <%@tag pageEncoding="UTF-8" %>
 
+<%@ tag import="com.cal.models.User" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    boolean isAdmin = currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"));
+%>
 <div x-data="{openDropDown: false}" class="relative ">
     <button @click="openDropDown = !openDropDown">
         <svg class="fill-current" width="16" height="16"
@@ -27,5 +32,15 @@
             </svg>
             Nouvelle conversation
         </button>
+        <% if (isAdmin) { %>
+        <button @click="openNewGroupModal"
+                class="flex w-full items-center gap-2 rounded-sm px-4 py-1.5 text-left text-sm hover:bg-gray dark:hover:bg-meta-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+                <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z"/>
+            </svg>
+            Nouveau groupe
+        </button>
+        <% } %>
+
     </div>
 </div>

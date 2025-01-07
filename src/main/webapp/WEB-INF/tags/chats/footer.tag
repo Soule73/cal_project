@@ -4,7 +4,7 @@
         class="sticky bottom-0 border-t border-stroke bg-white px-6 py-5 dark:border-strokedark dark:bg-boxdark">
     <div class="flex items-center justify-between space-x-4.5">
         <div class="relative w-full">
-            <input type="text" placeholder="Type something here"
+            <input type="text" placeholder="Taper un message"
                    x-model="newMessage"
                    @keyup.enter="sendMessage()"
                    class="h-13 w-full rounded-md border border-stroke bg-gray pl-5 pr-19 font-medium text-black placeholder-body outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark-2 dark:text-white"

@@ -2,7 +2,7 @@
 
 <div
         class="sticky flex items-center justify-between border-b border-stroke px-6 py-4.5 dark:border-strokedark" style="z-index:0 !important;">
-    <div class="flex items-center">
+    <div @click="openManageMembersModal()" class="flex cursor-pointer items-center">
         <div
                 class="mr-4.5 h-13 w-full max-w-13 overflow-hidden rounded-full">
             <svg class="h-full w-full object-cover object-center" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
