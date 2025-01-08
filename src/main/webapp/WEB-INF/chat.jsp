@@ -410,7 +410,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             },
 
             init() {
-                this.ws = new WebSocket("ws://localhost:${sockerPort}/<%=Routes.CHAT%>");
+                this.ws = new WebSocket("ws://localhost:${sockerPort}<%=Routes.CHAT%>");
 
                 this.ws.onopen = () => {
                     this.hasConnected = true;
