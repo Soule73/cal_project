@@ -16,4 +16,9 @@ public class MessageServlet extends HttpServlet {
         req.setAttribute("sockerPort",this.getServletContext().getInitParameter("SOCKET_PORT"));
         req.getRequestDispatcher("WEB-INF/chat.jsp").forward(req, resp);
     }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
+    }
 }

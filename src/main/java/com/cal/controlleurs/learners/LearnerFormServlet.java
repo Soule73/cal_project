@@ -170,7 +170,6 @@ public class LearnerFormServlet extends HttpServlet {
             errors.put("email", "L'email est déjà utilisé");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
-            System.out.print(e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             errors.put("global", "Une erreur s'est produite lors du traitement de la requête");
         }

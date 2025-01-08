@@ -410,7 +410,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             },
 
             init() {
-                this.ws = new WebSocket("ws://localhost:${sockerPort}<%=Routes.CHAT%>");
+                this.ws = new WebSocket("<%=Routes.WS_URL%>${sockerPort}<%=Routes.CHAT%>");
 
                 this.ws.onopen = () => {
                     this.hasConnected = true;
@@ -511,7 +511,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
 
             searchUsers(init = false) {
                 if (init || this.searchTerm.length > 1) {
-                    fetch('/group-user-search', {
+                    fetch('<%=Routes.GROUP_USER_SEARCH%>', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',

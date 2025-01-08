@@ -33,6 +33,9 @@ public class Routes {
     //Accées pour tout le monde si connecté
     public static final String MESSAGE = "/message";
     public static final String CHAT = "/chat";
+    public static final String WS_URL = "ws://localhost:";
+    public static final String GROUP_USER_SEARCH = "/group-user-search";
+    public static final String PRIVATE_USER_SEARCH = "/user-search";
 
 
 }

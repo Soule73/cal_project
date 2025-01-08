@@ -1,5 +1,6 @@
 package com.cal.controlleurs;
 
+import com.cal.Routes;
 import com.cal.models.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@WebServlet("/user-search")
+@WebServlet(Routes.PRIVATE_SEARCH)
 public class UserSearchServlet extends HttpServlet {
 
     private EntityManagerFactory emf;
