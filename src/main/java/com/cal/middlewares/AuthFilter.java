@@ -31,7 +31,14 @@ import java.io.IOException;
         Routes.SUBCRIPTION_LIST,
         Routes.MESSAGE,
         Routes.SUBCRIPTION_FORM,
-        Routes.CURRENT_LEARNER
+        Routes.CURRENT_LEARNER,
+
+        Routes.CHAT,
+        Routes.GROUP_USER_SEARCH,
+        Routes.PRIVATE_USER_SEARCH,
+        Routes.ROLE_LIST,
+        Routes.ROLE_FORM,
+        Routes.DASHBOARD,
 })
 public class AuthFilter implements Filter {
 
@@ -49,6 +56,7 @@ public class AuthFilter implements Filter {
 
         User currentUser = (User) session.getAttribute("user");
         String path = httpRequest.getServletPath();
+
 
         if (isAdminRoute(path)) {
             if (Permission.hasRole(currentUser, "ADMIN")) {
@@ -70,15 +78,24 @@ public class AuthFilter implements Filter {
         chain.doFilter(request, response);
     }
 
+    //routes autorisées seulement pour les admins
     private boolean isAdminRoute(String path) {
         return path.equals(Routes.LEARNER_LIST) || path.equals(Routes.LEARNER_FORM) || path.equals(Routes.LEARNER_SHOW)
                 || path.equals(Routes.LANG_LIST) || path.equals(Routes.LANG_FORM) || path.equals(Routes.LANG_SHOW)
-                || path.equals(Routes.LANG_COURSE) || path.equals(Routes.ROOM_LIST) || path.equals(Routes.ROOM_FORM)
+                || path.equals(Routes.LANG_COURSE) || path.equals(Routes.ROOM_LIST) ||
+                path.equals(Routes.ROLE_LIST) ||
+                path.equals(Routes.ROLE_FORM) ||
+                path.equals(Routes.DASHBOARD) ||
+                path.equals(Routes.ROOM_FORM)
                 || path.equals(Routes.COURSE_FORM) || path.equals(Routes.SUBCRIPTION_LIST) || path.equals(Routes.SUBCRIPTION_FORM);
     }
 
+    //routes autorisées pour les admins et apprenants
     private boolean isLearnerAndAdminRoute(String path) {
-        return path.equals(Routes.LEARN_SUBCRIPTIONS);
+        return path.equals(Routes.LEARN_SUBCRIPTIONS) ||
+                 path.equals(Routes.GROUP_USER_SEARCH) ||
+                 path.equals(Routes.PRIVATE_USER_SEARCH) ||
+                path.equals(Routes.CHAT);
     }
 
 

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@WebServlet(Routes.PRIVATE_SEARCH)
+@WebServlet(Routes.PRIVATE_USER_SEARCH)
 public class UserSearchServlet extends HttpServlet {
 
     private EntityManagerFactory emf;

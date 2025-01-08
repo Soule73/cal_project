@@ -20,6 +20,7 @@ public class Routes {
     public static final String ROOM_FORM = "/rooms/form";
 
     public static final String COURSE_FORM = "/course/form";
+    public static final String ROLE_FORM = "/course/role";
 
     public static final String SUBCRIPTION_LIST = "/subcriptions";
     public static final String SUBCRIPTION_FORM = "/subcriptions/form";
@@ -38,4 +39,7 @@ public class Routes {
     public static final String PRIVATE_USER_SEARCH = "/user-search";
 
 
+    public static final String ROLE_LIST = "/roles";
+    public static final String DASHBOARD = "/dashboard";
+    public static final String CURSE_USAGE = "/course-usage";
 }
